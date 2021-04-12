@@ -1,269 +1,275 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>frist post</title>
-    <url>/2021/04/04/frist-post/</url>
-    <content><![CDATA[<h2 id="这是一篇测试文章"><a href="#这是一篇测试文章" class="headerlink" title="这是一篇测试文章"></a>这是一篇测试文章</h2><p>相关说明</p>
+    <title>插入排序(InsertionSort)</title>
+    <url>/2021/04/08/%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F(InsertionSort)/</url>
+    <content><![CDATA[<h3 id="1-算法概述"><a href="#1-算法概述" class="headerlink" title="1.算法概述"></a>1.算法概述</h3><p>​    插入排序是一个平均时间复杂度**O(n^2)**级别的排序算法，它具有稳定性，即排序完成之后各个相同元素的相对顺序保持一致。</p>
+<p>​    插入排序的基本思想：<strong>在一个有序的序列中寻找一个合适的位置进行插入</strong></p>
 <span id="more"></span>
-
-<h3 id="一级"><a href="#一级" class="headerlink" title="一级"></a>一级</h3><h4 id="二级"><a href="#二级" class="headerlink" title="二级"></a>二级</h4><pre><code class="c++">
-#include &lt;stdlib.h&gt;
-#include &lt;stdio.h&gt;
-#include &lt;string.h&gt;
- 
-#include &lt;libavcodec/avcodec.h&gt;
-#include &lt;libavformat/avformat.h&gt;
- 
- 
-FILE *pfout = NULL;
-char ffrvout[128] = &#123; 0 &#125;;
- 
-/* how many yuv pic you want to save */
-#define FRAME_NUM 1
-/* enable video demux data save to file */
-//#define ENABLE_DEMUX_SAVE
-/* enable yuv pic save to file */
-#define ENABLE_YUV_SAVE
-/* enable print each video bytes */
-#define ENABLE_PRINT_FRAME_BYTES
-/* how many bytes you want to print */
-#define PRINT_BYTES 30
- 
-/* ------------------------------------------------------------------------- */
- 
-/**
- * main thread
- */
-int main(int argc, char *argv[])
-&#123;
-    int i;
-    char szFileName[128] = &#123;0&#125;;
-    int decLen = 0;
-    int frame = 0;
- 
-    AVCodecContext *pCodecCtx = NULL;
-    AVFrame *pFrame = NULL;
-    AVCodec *pCodec = NULL;
-    AVFormatContext *pFormatCtx = NULL;
- 
-    if(argc != 3)
-    &#123;
-        fprintf(stderr, &quot;ERROR:need 3 argument!\n&quot;);
-        exit(-1);
-    &#125;
-    
-    sprintf(szFileName, &quot;%s&quot;, argv[1]);
- 
-#ifdef ENABLE_DEMUX_SAVE
-    FILE* frvdemux = fopen(&quot;rvdemuxout.rm&quot;,&quot;wb+&quot;);
-    if (NULL == frvdemux)
-    &#123;
-        fprintf(stderr, &quot;create rvdemuxout file failed\n&quot;);
-        exit(1);
-    &#125;    
-#endif
- 
-    /* output yuv file name */
-    sprintf(ffrvout, &quot;%s&quot;, argv[2]);
- 
-    pfout = fopen(ffrvout, &quot;wb+&quot;);
-    if (NULL == pfout)
-    &#123;
-        printf(&quot;create output file failed\n&quot;);
-        exit(1);
-    &#125;
-    printf(&quot;==========&gt; Begin test ffmpeg call ffmpeg rv decoder\n&quot;);
-    av_register_all();
- 
-    /* Open input video file */
-    //printf(&quot;before avformat_open_input [%s]\n&quot;, szFileName);
-    if(avformat_open_input(&amp;pFormatCtx, szFileName, NULL, NULL)!= 0)
-    &#123;
-        fprintf(stderr, &quot;Couldn&#39;t open input file\n&quot;);
-        return -1;
-    &#125;
-    //printf(&quot;after avformat_open_input\n&quot;);
- 
-    /* Retrieve stream information */
-    if(av_find_stream_info(pFormatCtx) &lt; 0)
-    &#123;
-        printf(&quot;av_find_stream_info ERROR\n&quot;);
-        return -1;
-    &#125;
-    //printf(&quot;after av_find_stream_info, \n&quot;);
- 
- 
-    /* Find the first video stream */
-    int videoStream = -1;
-    printf(&quot;==========&gt; pFormatCtx-&gt;nb_streams = %d\n&quot;, pFormatCtx-&gt;nb_streams);
- 
-    for(i = 0; i &lt; pFormatCtx-&gt;nb_streams; i++) &#123;
-        if(pFormatCtx-&gt;streams[i]-&gt;codec-&gt;codec_type == AVMEDIA_TYPE_VIDEO) &#123;
-            videoStream = i;
-            printf(&quot;the first video stream index: videoStream = %d\n&quot;,videoStream);
-            break;
+<h3 id="2-算法步骤"><a href="#2-算法步骤" class="headerlink" title="2.算法步骤"></a>2.算法步骤</h3><ol>
+<li>默认取第二个元素开始与已经排好序的元素序列比较，因为第一个元素已经是有序的</li>
+<li>取下一个元素如果元素大于当前待插入的元素（动图中红色色块）则移动至下一个位置</li>
+<li>重复步骤2，直至找到当前待插入的元素<strong>小于或者等于</strong>比较的元素</li>
+<li>将当前待插入的元素插入到新的位置</li>
+<li>重复步骤2~4</li>
+</ol>
+<h3 id="3-算法动图演示"><a href="#3-算法动图演示" class="headerlink" title="3.算法动图演示"></a>3.算法动图演示</h3><p><img src="https://jesonblogbucket.oss-cn-shenzhen.aliyuncs.com/%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F%E5%8A%A8%E6%95%88.gif" alt="插入排序动效"></p>
+<h3 id="4-代码实现"><a href="#4-代码实现" class="headerlink" title="4.代码实现"></a>4.代码实现</h3><pre><code class="c++">template &lt;typename T&gt;
+void InsertSort(T* arr, int n) &#123;
+    for (int i = 1; i &lt; n; i++) &#123;
+        int j;
+        T tmp = arr[i];
+        // 向前查找一个合适的插入位置
+        for (j = i; j &gt; 0 &amp;&amp; arr[j - 1] &gt; tmp; --j) &#123;
+            arr[j] = arr[j - 1];
         &#125;
+        arr[j] = tmp;
     &#125;
- 
-    if(videoStream == -1)
-        return -1;        // Didn&#39;t find a video stream
- 
-    /* Get a pointer to the codec context for the video stream */
-    pCodecCtx = pFormatCtx-&gt;streams[videoStream]-&gt;codec;
-    printf(&quot;pCodecCtx-&gt;codec_id = %d\n&quot;, pCodecCtx-&gt;codec_id);
- 
-    pCodec = avcodec_find_decoder(pCodecCtx-&gt;codec_id);
-    if(pCodec == NULL) &#123;
-        fprintf(stderr, &quot;can not find decoder!\n&quot;);
-        return -1;
-    &#125;
- 
-    /* Open codec */
-    if(avcodec_open(pCodecCtx, pCodec)&lt;0)
-    &#123;
-        printf(&quot;cannot open software codec\n&quot;);
-        return -1; // Could not open codec
-    &#125;
-    printf(&quot;==========&gt; Open software codec success\n&quot;);
- 
-    pFrame = avcodec_alloc_frame();
-    if(pFrame == NULL)
-    &#123;
-        fprintf(stderr, &quot;avcodec_alloc_frame() ERROR\n&quot;);
-        return -1;
-    &#125;
-    
-    /* flag whether we get a decoded yuv frame */
-    int frameFinished;
-    int packetno = 0;
- 
-    AVPacket packet;
-    av_init_packet(&amp;packet);
- 
-    while(av_read_frame(pFormatCtx, &amp;packet) &gt;= 0) &#123;
-        //printf(&quot;[main]avpkt-&gt;slice_count=%d\n&quot;, packet.sliceNum);
- 
-        /* Is this a packet from the video stream? */
-        if(packet.stream_index == videoStream) &#123;
-            packetno++;
-#ifdef ENABLE_PRINT_FRAME_BYTES
-        if ( 1 ) &#123;
-            int i;
-            int size = packet.size &lt; PRINT_BYTES ? packet.size : PRINT_BYTES;
-            unsigned char *data = packet.data;
-            printf(&quot;===&gt;[%5d] [&quot;, packet.size);
-            for (i = 0; i &lt; size; i++)
-                printf(&quot;%02x &quot;, data[i]);
-            printf(&quot;]\n&quot;);
-        &#125;
-#endif
-#ifdef ENABLE_DEMUX_SAVE
-            fwrite(packet.data, 1, packet.size, frvdemux);
-#endif
-            //printf(&quot;[the %d packet]packet.size = %d\n&quot;, packetno++, packet.size);
- 
-            while (packet.size &gt; 0) &#123;
-                decLen = avcodec_decode_video2(pCodecCtx, pFrame, &amp;frameFinished, &amp;packet);
-                //printf(&quot;[video_decode_example]after avcodec_decode_video2,decoded=%d\n&quot;,decLen);
- 
-                if (decLen &lt; 0)    &#123;
-                    fprintf(stderr, &quot;[video_decode_example]Error while decoding frame %d\n&quot;, frame);
-                    //exit(1);
-                    /* FIXME if decode one frame err, ignore this frame */
-                    decLen = packet.size;
-                &#125;
- 
-                if (frameFinished) &#123;
-                    printf(&quot;got a yuv frame\n&quot;);
-                    //printf(stderr, &quot;[video_decode_example]saving frame %3d\n&quot;, frame);
- 
-                    /* the picture is allocated by the decoder. no need to free it */
-                    if (frame == 0) &#123;
-                        printf(&quot;[video_decode_example]picture-&gt;linesize[0]=%d, c-&gt;width=%d,c-&gt;height=%d\n&quot;, 
-                                pFrame-&gt;linesize[0], pCodecCtx-&gt;width, pCodecCtx-&gt;height);
-                        printf(&quot;===&gt;YUV format = %d\n&quot;, pFrame-&gt;format);
-                    &#125;
-#ifdef ENABLE_YUV_SAVE
-                    /* save yuv pic */
-                    if (frame &lt; FRAME_NUM) &#123;
-                        switch (pFrame-&gt;format) &#123;
-                            case 0 :    /* YUV420P */
-                                yuv420p_save(pFrame, pCodecCtx);
-                                break;
-                            case 2 :    /* RGB24 */
-                                rgb24_save(pFrame, pCodecCtx);
-                                break;
-                            case 13 :    /* YUVJ422P */
-                                yuv422p_save(pFrame, pCodecCtx);
-                                break;
-                            case 14 :    /* YUVJ444P */
-                                yuv444p_save(pFrame, pCodecCtx);
-                                break;
-                            default :
-                                fprintf(stderr, &quot;unsupport YUV format for saving\n&quot;);
-                                break;
-                        &#125;
-                        fprintf(stderr, &quot;===&gt;save pic success\n&quot;);
-                    &#125;
-#endif
-                    /* frame index grow */
-                    frame++;
-                &#125;
-                //printf(&quot;===========&gt; %d\n&quot;, decLen);
-                /* left data in pkt , go on decoding */
-                packet.data += decLen;
-                packet.size -= decLen;
-            &#125;
-            if (frame == FRAME_NUM) &#123;
-                printf(&quot;==========&gt; decoded [%d pkt frames] ---&gt; save [%d YUV frames], enough to stop!\n&quot;, packetno, FRAME_NUM);
-                break;
-            &#125;
-        &#125;
- 
-        /* FIXME no need free in this file */
-        //printf(&quot;free packet that was allocated by av_read_frame\n&quot;);
-        // Free the packet that was allocated by av_read_frame
-        //av_free_packet(&amp;packet);
-    &#125;
- 
-    printf(&quot;decoding job down! begin to free\n&quot;);
-    /* Free the YUV frame */
-    av_free(pFrame);
- 
-    /* Close the codec */
-    avcodec_close(pCodecCtx);
- 
-    /* Close the video file */
-    av_close_input_file(pFormatCtx);
-    fclose(pfout);
- 
-    printf(&quot;==========&gt; END-OK\n&quot;);
- 
-    return 0;
 &#125;
 </code></pre>
-<h5 id="三级"><a href="#三级" class="headerlink" title="三级"></a>三级</h5><p><a href="https://upload-images.jianshu.io/upload_images/16069544-f13ec91992d789e0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/704/format/webp"></a></p>
+<h3 id="5-插入排序总结"><a href="#5-插入排序总结" class="headerlink" title="5.插入排序总结"></a>5.插入排序总结</h3><p>​    插入排序的平均复杂度虽然是O(n^2)，但是插入排序在小规模数据的中排序效率的表现甚至O(nlogn)级别的排序效率高，因此常常被用来作为大规模排序中的子排序，以提高算法运行效率</p>
 ]]></content>
+      <categories>
+        <category>算法</category>
+      </categories>
       <tags>
-        <tag>测试</tag>
+        <tag>算法</tag>
+        <tag>排序算法</tag>
       </tags>
   </entry>
   <entry>
-    <title>Hello World</title>
-    <url>/2021/04/05/hello-world/</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><pre><code class="bash">$ hexo new &quot;My New Post&quot;
+    <title>leetcode练习记录-字符串</title>
+    <url>/2021/04/08/leetcode%E7%BB%83%E4%B9%A0%E8%AE%B0%E5%BD%95-%E5%AD%97%E7%AC%A6%E4%B8%B2/</url>
+    <content><![CDATA[<p>leetcode关于字符串相关算法练习，不定期更新</p>
+<span id="more"></span>
+
+<h2 id="有效的字母异位词"><a href="#有效的字母异位词" class="headerlink" title="有效的字母异位词"></a>有效的字母异位词</h2><h3 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h3><p>给定两个字符串 <em>s</em> 和 <em>t</em> ，编写一个函数来判断 <em>t</em> 是否是 <em>s</em> 的字母异位词。</p>
+<p><strong>示例 1:</strong></p>
+<pre><code>输入: s = &quot;anagram&quot;, t = &quot;nagaram&quot;
+输出: true
 </code></pre>
-<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><pre><code class="bash">$ hexo server
+<p><strong>示例 2:</strong></p>
+<pre><code>输入: s = &quot;rat&quot;, t = &quot;car&quot;
+输出: false
 </code></pre>
-<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><pre><code class="bash">$ hexo generate
+<p><strong>说明:</strong><br>你可以假设字符串只包含小写字母。</p>
+<h3 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h3><p>​    字母异位词的字符串长度和相对应的字母数量是相等的，因此可以借鉴桶排序的思想来统计每个字母的数量是否是相等的，如果不相等则就不是字母异位词</p>
+<h3 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h3><pre><code class="C++">bool isAnagram(string s, string t)
+&#123;
+    if (s.size() != t.size()) &#123;
+        return false;
+    &#125;
+
+    int sArr[256] = &#123; 0 &#125;;
+    int tArr[256] = &#123; 0 &#125;;
+
+    for (int i = 0; i &lt; s.size(); ++i) &#123;
+        sArr[s[i]]++;
+        tArr[t[i]]++;
+    &#125;
+
+    for (int i = 0; i &lt; 256; ++i) &#123;
+        if (sArr[i] != tArr[i]) &#123;
+            return false;
+        &#125;
+    &#125;
+    return true;
+&#125;
 </code></pre>
-<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><pre><code class="bash">$ hexo deploy
+<h2 id="验证回文字符串"><a href="#验证回文字符串" class="headerlink" title="验证回文字符串"></a>验证回文字符串</h2><h3 id="题目-1"><a href="#题目-1" class="headerlink" title="题目"></a>题目</h3><p>给定一个字符串，验证它是否是回文串，只考虑字母和数字字符，可以忽略字母的大小写。</p>
+<p><strong>说明：</strong>本题中，我们将空字符串定义为有效的回文串。</p>
+<p><strong>示例 1:</strong></p>
+<pre><code>输入: &quot;A man, a plan, a canal: Panama&quot;
+输出: true
 </code></pre>
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+<p><strong>示例 2:</strong></p>
+<pre><code>输入: &quot;race a car&quot;
+输出: false
+</code></pre>
+<h3 id="思路-1"><a href="#思路-1" class="headerlink" title="思路"></a>思路</h3><p>​    使用两个游标，一个在字符串头，一个在字符串尾，两个游标同时向中间靠拢，遇到<strong>非字母和数字</strong>就跳过</p>
+<h3 id="实现-1"><a href="#实现-1" class="headerlink" title="实现"></a>实现</h3><pre><code class="c++">bool isLetterOrNum(char c)
+&#123;
+    if ((c &gt;= &#39;A&#39; &amp;&amp; c &lt;= &#39;Z&#39;) 
+        || (c &gt;= &#39;a&#39; &amp;&amp; c &lt;= &#39;z&#39;)
+        || (c &gt;= &#39;0&#39; &amp;&amp; c &lt;= &#39;9&#39;)) &#123;
+        return true;
+    &#125;
+    return false;
+&#125;
+
+bool compareLetter(char c, char c1)
+&#123;
+    if (c == c1) &#123;
+        return true;
+    &#125; else if (c &gt;= &#39;A&#39; &amp;&amp; c &lt;= &#39;Z&#39;) &#123;
+        return c + 32 == c1;
+    &#125; else if (c &gt;= &#39;a&#39; &amp;&amp; c &lt;= &#39;z&#39;) &#123;
+        return c - 32 == c1;
+    &#125; else &#123;
+        return false;
+    &#125;
+&#125;
+
+bool isPalindrome(string s)
+&#123;
+    if (s.empty() || s.size() == 1) &#123;
+        return true;
+    &#125;
+    
+    int l = 0;               // 字符串第一个字符
+    int r = s.size() - 1; // 字符串最后一个字符
+
+    while (l &lt; r) &#123;
+        // 从前往后找到字母或数字, 保证l不越界
+        while (l &lt; s.size() &amp;&amp; !isLetterOrNum(s[l])) &#123;
+            l++;
+        &#125; 
+
+        // 从后往前找到字母或数字， 保证r不越界
+        while(r &gt;= 0 &amp;&amp; !isLetterOrNum(s[r])) &#123;
+            r--;
+        &#125;
+
+        // 如果字符串没有字母或数字则返回真
+        if (l == s.size() || r &lt; 0) &#123;
+            return true;
+        &#125;
+
+        if(!compareLetter(s[l], s[r]))&#123;
+            return false;
+        &#125;
+        ++l;
+        --r;
+    &#125;
+    return true;
+&#125;
+</code></pre>
+<h2 id="字符串转换整数-atoi"><a href="#字符串转换整数-atoi" class="headerlink" title="字符串转换整数(atoi)"></a>字符串转换整数(atoi)</h2><h3 id="题目-2"><a href="#题目-2" class="headerlink" title="题目"></a>题目</h3><p>请你来实现一个 <code>atoi</code> 函数，使其能将字符串转换成整数。</p>
+<p>首先，该函数会根据需要丢弃无用的开头空格字符，直到寻找到第一个非空格的字符为止。</p>
+<p>当我们寻找到的第一个非空字符为正或者负号时，则将该符号与之后面尽可能多的连续数字组合起来，作为该整数的正负号；假如第一个非空字符是数字，则直接将其与之后连续的数字字符组合起来，形成整数。</p>
+<p>该字符串除了有效的整数部分之后也可能会存在多余的字符，这些字符可以被忽略，它们对于函数不应该造成影响。</p>
+<p>注意：假如该字符串中的第一个非空格字符不是一个有效整数字符、字符串为空或字符串仅包含空白字符时，则你的函数不需要进行转换。</p>
+<p>在任何情况下，若函数不能进行有效的转换时，请返回 0。</p>
+<p><strong>说明：</strong></p>
+<p>假设我们的环境只能存储 32 位大小的有符号整数，那么其数值范围为 [−2^31,  2^31 − 1]。如果数值超过这个范围，qing返回  INT_MAX (2^31 − 1) 或 INT_MIN (−2^31) 。</p>
+<h3 id="思路-2"><a href="#思路-2" class="headerlink" title="思路"></a>思路</h3><p>​    根据题干分为几个步骤</p>
+<ol>
+<li>跳开字符串前面的空格</li>
+<li>判断正负号</li>
+<li>判断是否是数字，如果是就计算数值</li>
+<li>判断该数字是否溢出，因此需要4个字节以上的存储空间，这里选用double类型（在leetcode的环境中，long或者long long存储num都会溢出）</li>
+</ol>
+<h3 id="实现-2"><a href="#实现-2" class="headerlink" title="实现"></a>实现</h3><pre><code class="c++">int myAtoi(string str)
+&#123;
+    if (str.empty()) &#123;
+        return 0;
+    &#125;
+
+    int i = 0;
+    double num = 0;
+    int negative = 1;
+    // 忽略前面的空格
+    while (str[i] == &#39; &#39;)++i;
+    // 判断正负号
+    if (str[i] == &#39;-&#39;) &#123;
+        negative = -1;
+        i++;
+    &#125; else if (str[i] == &#39;+&#39;) &#123;
+        i++;
+    &#125;
+    // 计算数字
+    while (str[i] &gt;= &#39;0&#39; &amp;&amp; str[i] &lt;= &#39;9&#39;) &#123;
+        num = str[i] - &#39;0&#39; + num * 10;
+        ++i;
+    &#125;
+    // 恢复数字的符号
+    num *= negative;
+
+    if (num &lt; INT_MIN) &#123;
+        num = INT_MIN;
+    &#125; else if (num &gt; INT_MAX) &#123;
+        num = INT_MAX;
+    &#125;
+
+    return num;
+&#125;
+</code></pre>
+<h2 id="实现strStr"><a href="#实现strStr" class="headerlink" title="实现strStr()"></a>实现strStr()</h2><h3 id="题目-3"><a href="#题目-3" class="headerlink" title="题目"></a>题目</h3><p>给定一个 haystack 字符串和一个 needle 字符串，在 haystack 字符串中找出 needle 字符串出现的第一个位置 (从0开始)。如果不存在，则返回  <strong>-1</strong>。</p>
+<p><strong>示例 1:</strong></p>
+<pre><code>输入: haystack = &quot;hello&quot;, needle = &quot;ll&quot;
+输出: 2
+</code></pre>
+<p><strong>示例 2:</strong></p>
+<pre><code>输入: haystack = &quot;aaaaa&quot;, needle = &quot;bba&quot;
+输出: -1
+</code></pre>
+<p><strong>说明:</strong></p>
+<p>当 <code>needle</code> 是空字符串时，我们应当返回什么值呢？这是一个在面试中很好的问题。</p>
+<p>对于本题而言，当 <code>needle</code> 是空字符串时我们应当返回 0 。这与C语言的 <code>strstr()</code>以及 Java的 <code>indexOf()</code> 定义相符。</p>
+<h3 id="思路-3"><a href="#思路-3" class="headerlink" title="思路"></a>思路</h3><p>​    在haystack字符串中找出needle字符串意味着<strong>haystack的字符长度大于等于needle的字符长度</strong>，而且只需要执行haystack.length()-needle.length()次比较</p>
+<h3 id="实现-3"><a href="#实现-3" class="headerlink" title="实现"></a>实现</h3><pre><code class="c++">int strStr(string haystack, string needle)
+&#123;
+    if (needle.empty()) &#123;
+        return 0;
+    &#125;
+
+#if 0
+    return haystack.find(needle);
+#else
+    int j;
+    int hlen = haystack.length(), nlen = needle.length();
+    for (int i = 0; i &lt;= hlen - nlen; ++i) &#123;
+        for (j = 0; j &lt; nlen; ++j) &#123;
+            if (haystack[i + j] != needle[j]) &#123;
+                break;
+            &#125;
+        &#125;
+        if (j == nlen) &#123;
+            return i;
+        &#125;
+    &#125;
+    return -1;
+#endif
+&#125;
+</code></pre>
+<h2 id="最长公共前缀"><a href="#最长公共前缀" class="headerlink" title="最长公共前缀"></a>最长公共前缀</h2><h3 id="题目-4"><a href="#题目-4" class="headerlink" title="题目"></a>题目</h3><p>编写一个函数来查找字符串数组中的最长公共前缀。如果不存在公共前缀，返回空字符串 <code>&quot;&quot;</code>。</p>
+<p><strong>示例 1:</strong></p>
+<pre><code>输入: [&quot;flower&quot;,&quot;flow&quot;,&quot;flight&quot;]
+输出: &quot;fl&quot;
+</code></pre>
+<p><strong>示例 2:</strong></p>
+<pre><code>输入: [&quot;dog&quot;,&quot;racecar&quot;,&quot;car&quot;]
+输出: &quot;&quot;
+解释: 输入不存在公共前缀。
+</code></pre>
+<p><strong>说明:</strong></p>
+<p>所有输入只包含小写字母 <code>a-z</code> 。</p>
+<h3 id="思路-4"><a href="#思路-4" class="headerlink" title="思路"></a>思路</h3><p>​    以数组中的第一个字符串作为基准，遍历比较字符串相应下标的字符，相等则放入vector中，如果其中一个不相等则直接返回</p>
+<h3 id="实现-4"><a href="#实现-4" class="headerlink" title="实现"></a>实现</h3><pre><code class="c++">string longestCommonPrefix(vector&lt;string&gt;&amp; strs)
+&#123;    
+    string res=&quot;&quot;;
+    if(strs.empty())
+        return res;
+    for(int i=0; i&lt;strs[0].size(); ++i)
+    &#123;
+        for(int j=1; j&lt;strs.size(); ++j)
+        &#123;
+            if(strs[j][i]!=strs[0][i])
+                return res;
+        &#125;
+        res.push_back(strs[0][i]);
+    &#125;
+    return res;
+&#125;
+</code></pre>
 ]]></content>
+      <categories>
+        <category>leetcode</category>
+      </categories>
+      <tags>
+        <tag>算法</tag>
+        <tag>leetcode</tag>
+        <tag>字符串</tag>
+      </tags>
   </entry>
 </search>

@@ -20,20 +20,23 @@
     var CONFIG = {"hostname":"jesonwoo.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":"default"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="这是一篇测试文章相关说明">
+  <meta name="description" content="1.算法概述​    插入排序是一个平均时间复杂度**O(n^2)**级别的排序算法，它具有稳定性，即排序完成之后各个相同元素的相对顺序保持一致。 ​    插入排序的基本思想：在一个有序的序列中寻找一个合适的位置进行插入">
 <meta property="og:type" content="article">
-<meta property="og:title" content="frist post">
-<meta property="og:url" content="https://jesonwoo.github.io/2021/04/04/frist-post/index.html">
+<meta property="og:title" content="插入排序(InsertionSort)">
+<meta property="og:url" content="https://jesonwoo.github.io/2021/04/08/%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F(InsertionSort)/index.html">
 <meta property="og:site_name" content="Jesonwoo&#39;s Blog">
-<meta property="og:description" content="这是一篇测试文章相关说明">
+<meta property="og:description" content="1.算法概述​    插入排序是一个平均时间复杂度**O(n^2)**级别的排序算法，它具有稳定性，即排序完成之后各个相同元素的相对顺序保持一致。 ​    插入排序的基本思想：在一个有序的序列中寻找一个合适的位置进行插入">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2021-04-04T06:45:05.000Z">
-<meta property="article:modified_time" content="2021-04-05T03:49:25.978Z">
+<meta property="og:image" content="https://jesonblogbucket.oss-cn-shenzhen.aliyuncs.com/%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F%E5%8A%A8%E6%95%88.gif">
+<meta property="article:published_time" content="2021-04-08T07:44:59.432Z">
+<meta property="article:modified_time" content="2021-04-08T06:42:49.084Z">
 <meta property="article:author" content="Jesonwoo">
-<meta property="article:tag" content="测试">
+<meta property="article:tag" content="算法">
+<meta property="article:tag" content="排序算法">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://jesonblogbucket.oss-cn-shenzhen.aliyuncs.com/%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F%E5%8A%A8%E6%95%88.gif">
 
-<link rel="canonical" href="https://jesonwoo.github.io/2021/04/04/frist-post/">
+<link rel="canonical" href="https://jesonwoo.github.io/2021/04/08/%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F(InsertionSort)/">
 
 
 <script id="page-configurations">
@@ -46,7 +49,7 @@
   };
 </script>
 
-  <title>frist post | Jesonwoo's Blog</title>
+  <title>插入排序(InsertionSort) | Jesonwoo's Blog</title>
   
 
 
@@ -196,7 +199,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://jesonwoo.github.io/2021/04/04/frist-post/">
+    <link itemprop="mainEntityOfPage" href="https://jesonwoo.github.io/2021/04/08/%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F(InsertionSort)/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/header.jpg">
@@ -209,7 +212,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          frist post
+          插入排序(InsertionSort)
         </h1>
 
         <div class="post-meta">
@@ -218,16 +221,19 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2021-04-04 14:45:05" itemprop="dateCreated datePublished" datetime="2021-04-04T14:45:05+08:00">2021-04-04</time>
+              <time title="创建时间：2021-04-08 15:44:59 / 修改时间：14:42:49" itemprop="dateCreated datePublished" datetime="2021-04-08T15:44:59+08:00">2021-04-08</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-04-05 11:49:25" itemprop="dateModified" datetime="2021-04-05T11:49:25+08:00">2021-04-05</time>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
               </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
+                </span>
+            </span>
 
           
             <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
@@ -242,14 +248,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>5.6k</span>
+              <span>559</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>5 分钟</span>
+              <span>1 分钟</span>
             </span>
 
         </div>
@@ -261,246 +267,31 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="这是一篇测试文章"><a href="#这是一篇测试文章" class="headerlink" title="这是一篇测试文章"></a>这是一篇测试文章</h2><p>相关说明</p>
+        <h3 id="1-算法概述"><a href="#1-算法概述" class="headerlink" title="1.算法概述"></a>1.算法概述</h3><p>​    插入排序是一个平均时间复杂度**O(n^2)**级别的排序算法，它具有稳定性，即排序完成之后各个相同元素的相对顺序保持一致。</p>
+<p>​    插入排序的基本思想：<strong>在一个有序的序列中寻找一个合适的位置进行插入</strong></p>
 <span id="more"></span>
-
-<h3 id="一级"><a href="#一级" class="headerlink" title="一级"></a>一级</h3><h4 id="二级"><a href="#二级" class="headerlink" title="二级"></a>二级</h4><pre><code class="c++">
-#include &lt;stdlib.h&gt;
-#include &lt;stdio.h&gt;
-#include &lt;string.h&gt;
- 
-#include &lt;libavcodec/avcodec.h&gt;
-#include &lt;libavformat/avformat.h&gt;
- 
- 
-FILE *pfout = NULL;
-char ffrvout[128] = &#123; 0 &#125;;
- 
-/* how many yuv pic you want to save */
-#define FRAME_NUM 1
-/* enable video demux data save to file */
-//#define ENABLE_DEMUX_SAVE
-/* enable yuv pic save to file */
-#define ENABLE_YUV_SAVE
-/* enable print each video bytes */
-#define ENABLE_PRINT_FRAME_BYTES
-/* how many bytes you want to print */
-#define PRINT_BYTES 30
- 
-/* ------------------------------------------------------------------------- */
- 
-/**
- * main thread
- */
-int main(int argc, char *argv[])
-&#123;
-    int i;
-    char szFileName[128] = &#123;0&#125;;
-    int decLen = 0;
-    int frame = 0;
- 
-    AVCodecContext *pCodecCtx = NULL;
-    AVFrame *pFrame = NULL;
-    AVCodec *pCodec = NULL;
-    AVFormatContext *pFormatCtx = NULL;
- 
-    if(argc != 3)
-    &#123;
-        fprintf(stderr, &quot;ERROR:need 3 argument!\n&quot;);
-        exit(-1);
-    &#125;
-    
-    sprintf(szFileName, &quot;%s&quot;, argv[1]);
- 
-#ifdef ENABLE_DEMUX_SAVE
-    FILE* frvdemux = fopen(&quot;rvdemuxout.rm&quot;,&quot;wb+&quot;);
-    if (NULL == frvdemux)
-    &#123;
-        fprintf(stderr, &quot;create rvdemuxout file failed\n&quot;);
-        exit(1);
-    &#125;    
-#endif
- 
-    /* output yuv file name */
-    sprintf(ffrvout, &quot;%s&quot;, argv[2]);
- 
-    pfout = fopen(ffrvout, &quot;wb+&quot;);
-    if (NULL == pfout)
-    &#123;
-        printf(&quot;create output file failed\n&quot;);
-        exit(1);
-    &#125;
-    printf(&quot;==========&gt; Begin test ffmpeg call ffmpeg rv decoder\n&quot;);
-    av_register_all();
- 
-    /* Open input video file */
-    //printf(&quot;before avformat_open_input [%s]\n&quot;, szFileName);
-    if(avformat_open_input(&amp;pFormatCtx, szFileName, NULL, NULL)!= 0)
-    &#123;
-        fprintf(stderr, &quot;Couldn&#39;t open input file\n&quot;);
-        return -1;
-    &#125;
-    //printf(&quot;after avformat_open_input\n&quot;);
- 
-    /* Retrieve stream information */
-    if(av_find_stream_info(pFormatCtx) &lt; 0)
-    &#123;
-        printf(&quot;av_find_stream_info ERROR\n&quot;);
-        return -1;
-    &#125;
-    //printf(&quot;after av_find_stream_info, \n&quot;);
- 
- 
-    /* Find the first video stream */
-    int videoStream = -1;
-    printf(&quot;==========&gt; pFormatCtx-&gt;nb_streams = %d\n&quot;, pFormatCtx-&gt;nb_streams);
- 
-    for(i = 0; i &lt; pFormatCtx-&gt;nb_streams; i++) &#123;
-        if(pFormatCtx-&gt;streams[i]-&gt;codec-&gt;codec_type == AVMEDIA_TYPE_VIDEO) &#123;
-            videoStream = i;
-            printf(&quot;the first video stream index: videoStream = %d\n&quot;,videoStream);
-            break;
+<h3 id="2-算法步骤"><a href="#2-算法步骤" class="headerlink" title="2.算法步骤"></a>2.算法步骤</h3><ol>
+<li>默认取第二个元素开始与已经排好序的元素序列比较，因为第一个元素已经是有序的</li>
+<li>取下一个元素如果元素大于当前待插入的元素（动图中红色色块）则移动至下一个位置</li>
+<li>重复步骤2，直至找到当前待插入的元素<strong>小于或者等于</strong>比较的元素</li>
+<li>将当前待插入的元素插入到新的位置</li>
+<li>重复步骤2~4</li>
+</ol>
+<h3 id="3-算法动图演示"><a href="#3-算法动图演示" class="headerlink" title="3.算法动图演示"></a>3.算法动图演示</h3><p><img src="https://jesonblogbucket.oss-cn-shenzhen.aliyuncs.com/%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F%E5%8A%A8%E6%95%88.gif" alt="插入排序动效"></p>
+<h3 id="4-代码实现"><a href="#4-代码实现" class="headerlink" title="4.代码实现"></a>4.代码实现</h3><pre><code class="c++">template &lt;typename T&gt;
+void InsertSort(T* arr, int n) &#123;
+    for (int i = 1; i &lt; n; i++) &#123;
+        int j;
+        T tmp = arr[i];
+        // 向前查找一个合适的插入位置
+        for (j = i; j &gt; 0 &amp;&amp; arr[j - 1] &gt; tmp; --j) &#123;
+            arr[j] = arr[j - 1];
         &#125;
+        arr[j] = tmp;
     &#125;
- 
-    if(videoStream == -1)
-        return -1;        // Didn&#39;t find a video stream
- 
-    /* Get a pointer to the codec context for the video stream */
-    pCodecCtx = pFormatCtx-&gt;streams[videoStream]-&gt;codec;
-    printf(&quot;pCodecCtx-&gt;codec_id = %d\n&quot;, pCodecCtx-&gt;codec_id);
- 
-    pCodec = avcodec_find_decoder(pCodecCtx-&gt;codec_id);
-    if(pCodec == NULL) &#123;
-        fprintf(stderr, &quot;can not find decoder!\n&quot;);
-        return -1;
-    &#125;
- 
-    /* Open codec */
-    if(avcodec_open(pCodecCtx, pCodec)&lt;0)
-    &#123;
-        printf(&quot;cannot open software codec\n&quot;);
-        return -1; // Could not open codec
-    &#125;
-    printf(&quot;==========&gt; Open software codec success\n&quot;);
- 
-    pFrame = avcodec_alloc_frame();
-    if(pFrame == NULL)
-    &#123;
-        fprintf(stderr, &quot;avcodec_alloc_frame() ERROR\n&quot;);
-        return -1;
-    &#125;
-    
-    /* flag whether we get a decoded yuv frame */
-    int frameFinished;
-    int packetno = 0;
- 
-    AVPacket packet;
-    av_init_packet(&amp;packet);
- 
-    while(av_read_frame(pFormatCtx, &amp;packet) &gt;= 0) &#123;
-        //printf(&quot;[main]avpkt-&gt;slice_count=%d\n&quot;, packet.sliceNum);
- 
-        /* Is this a packet from the video stream? */
-        if(packet.stream_index == videoStream) &#123;
-            packetno++;
-#ifdef ENABLE_PRINT_FRAME_BYTES
-        if ( 1 ) &#123;
-            int i;
-            int size = packet.size &lt; PRINT_BYTES ? packet.size : PRINT_BYTES;
-            unsigned char *data = packet.data;
-            printf(&quot;===&gt;[%5d] [&quot;, packet.size);
-            for (i = 0; i &lt; size; i++)
-                printf(&quot;%02x &quot;, data[i]);
-            printf(&quot;]\n&quot;);
-        &#125;
-#endif
-#ifdef ENABLE_DEMUX_SAVE
-            fwrite(packet.data, 1, packet.size, frvdemux);
-#endif
-            //printf(&quot;[the %d packet]packet.size = %d\n&quot;, packetno++, packet.size);
- 
-            while (packet.size &gt; 0) &#123;
-                decLen = avcodec_decode_video2(pCodecCtx, pFrame, &amp;frameFinished, &amp;packet);
-                //printf(&quot;[video_decode_example]after avcodec_decode_video2,decoded=%d\n&quot;,decLen);
- 
-                if (decLen &lt; 0)    &#123;
-                    fprintf(stderr, &quot;[video_decode_example]Error while decoding frame %d\n&quot;, frame);
-                    //exit(1);
-                    /* FIXME if decode one frame err, ignore this frame */
-                    decLen = packet.size;
-                &#125;
- 
-                if (frameFinished) &#123;
-                    printf(&quot;got a yuv frame\n&quot;);
-                    //printf(stderr, &quot;[video_decode_example]saving frame %3d\n&quot;, frame);
- 
-                    /* the picture is allocated by the decoder. no need to free it */
-                    if (frame == 0) &#123;
-                        printf(&quot;[video_decode_example]picture-&gt;linesize[0]=%d, c-&gt;width=%d,c-&gt;height=%d\n&quot;, 
-                                pFrame-&gt;linesize[0], pCodecCtx-&gt;width, pCodecCtx-&gt;height);
-                        printf(&quot;===&gt;YUV format = %d\n&quot;, pFrame-&gt;format);
-                    &#125;
-#ifdef ENABLE_YUV_SAVE
-                    /* save yuv pic */
-                    if (frame &lt; FRAME_NUM) &#123;
-                        switch (pFrame-&gt;format) &#123;
-                            case 0 :    /* YUV420P */
-                                yuv420p_save(pFrame, pCodecCtx);
-                                break;
-                            case 2 :    /* RGB24 */
-                                rgb24_save(pFrame, pCodecCtx);
-                                break;
-                            case 13 :    /* YUVJ422P */
-                                yuv422p_save(pFrame, pCodecCtx);
-                                break;
-                            case 14 :    /* YUVJ444P */
-                                yuv444p_save(pFrame, pCodecCtx);
-                                break;
-                            default :
-                                fprintf(stderr, &quot;unsupport YUV format for saving\n&quot;);
-                                break;
-                        &#125;
-                        fprintf(stderr, &quot;===&gt;save pic success\n&quot;);
-                    &#125;
-#endif
-                    /* frame index grow */
-                    frame++;
-                &#125;
-                //printf(&quot;===========&gt; %d\n&quot;, decLen);
-                /* left data in pkt , go on decoding */
-                packet.data += decLen;
-                packet.size -= decLen;
-            &#125;
-            if (frame == FRAME_NUM) &#123;
-                printf(&quot;==========&gt; decoded [%d pkt frames] ---&gt; save [%d YUV frames], enough to stop!\n&quot;, packetno, FRAME_NUM);
-                break;
-            &#125;
-        &#125;
- 
-        /* FIXME no need free in this file */
-        //printf(&quot;free packet that was allocated by av_read_frame\n&quot;);
-        // Free the packet that was allocated by av_read_frame
-        //av_free_packet(&amp;packet);
-    &#125;
- 
-    printf(&quot;decoding job down! begin to free\n&quot;);
-    /* Free the YUV frame */
-    av_free(pFrame);
- 
-    /* Close the codec */
-    avcodec_close(pCodecCtx);
- 
-    /* Close the video file */
-    av_close_input_file(pFormatCtx);
-    fclose(pfout);
- 
-    printf(&quot;==========&gt; END-OK\n&quot;);
- 
-    return 0;
 &#125;
 </code></pre>
-<h5 id="三级"><a href="#三级" class="headerlink" title="三级"></a>三级</h5><p><a target="_blank" rel="noopener" href="https://upload-images.jianshu.io/upload_images/16069544-f13ec91992d789e0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/704/format/webp"></a></p>
+<h3 id="5-插入排序总结"><a href="#5-插入排序总结" class="headerlink" title="5.插入排序总结"></a>5.插入排序总结</h3><p>​    插入排序的平均复杂度虽然是O(n^2)，但是插入排序在小规模数据的中排序效率的表现甚至O(nlogn)级别的排序效率高，因此常常被用来作为大规模排序中的子排序，以提高算法运行效率</p>
 
     </div>
 
@@ -510,7 +301,8 @@ int main(int argc, char *argv[])
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/%E6%B5%8B%E8%AF%95/" rel="tag"># 测试</a>
+              <a href="/tags/%E7%AE%97%E6%B3%95/" rel="tag"># 算法</a>
+              <a href="/tags/%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/" rel="tag"># 排序算法</a>
           </div>
 
         
@@ -518,11 +310,11 @@ int main(int argc, char *argv[])
 
         
     <div class="post-nav">
-      <div class="post-nav-item"></div>
       <div class="post-nav-item">
-    <a href="/2021/04/05/hello-world/" rel="next" title="Hello World">
-      Hello World <i class="fa fa-chevron-right"></i>
+    <a href="/2021/04/08/leetcode%E7%BB%83%E4%B9%A0%E8%AE%B0%E5%BD%95-%E5%AD%97%E7%AC%A6%E4%B8%B2/" rel="prev" title="leetcode练习记录-字符串">
+      <i class="fa fa-chevron-left"></i> leetcode练习记录-字符串
     </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -581,7 +373,7 @@ int main(int argc, char *argv[])
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%99%E6%98%AF%E4%B8%80%E7%AF%87%E6%B5%8B%E8%AF%95%E6%96%87%E7%AB%A0"><span class="nav-text">这是一篇测试文章</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E7%BA%A7"><span class="nav-text">一级</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BA%8C%E7%BA%A7"><span class="nav-text">二级</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%B8%89%E7%BA%A7"><span class="nav-text">三级</span></a></li></ol></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E7%AE%97%E6%B3%95%E6%A6%82%E8%BF%B0"><span class="nav-text">1.算法概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E7%AE%97%E6%B3%95%E6%AD%A5%E9%AA%A4"><span class="nav-text">2.算法步骤</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E7%AE%97%E6%B3%95%E5%8A%A8%E5%9B%BE%E6%BC%94%E7%A4%BA"><span class="nav-text">3.算法动图演示</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0"><span class="nav-text">4.代码实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F%E6%80%BB%E7%BB%93"><span class="nav-text">5.插入排序总结</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -601,10 +393,16 @@ int main(int argc, char *argv[])
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-count">4</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -646,13 +444,13 @@ int main(int argc, char *argv[])
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">6k</span>
+    <span title="站点总字数">5k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">5 分钟</span>
+    <span title="站点阅读时长">4 分钟</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
   </div>
