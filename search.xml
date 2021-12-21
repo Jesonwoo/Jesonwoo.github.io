@@ -166,4 +166,150 @@
         <tag>排序算法</tag>
       </tags>
   </entry>
+  <entry>
+    <title>常用排序算法总结</title>
+    <url>/2021/12/21/%E5%B8%B8%E7%94%A8%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E6%80%BB%E7%BB%93/</url>
+    <content><![CDATA[<p>学习排序算法时的总结和记录</p>
+<span id="more"></span>
+
+<h2 id="各种排序算法比较"><a href="#各种排序算法比较" class="headerlink" title="各种排序算法比较"></a>各种排序算法比较</h2><table>
+<thead>
+<tr>
+<th>排序</th>
+<th>时间复杂度</th>
+<th>空间复杂度</th>
+<th>稳定性</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>直接插入排序</td>
+<td>O(n^2)</td>
+<td>O(1)</td>
+<td>稳定</td>
+</tr>
+<tr>
+<td>希尔排序</td>
+<td>根据增量序列的不同时间复杂度不同；可以很接近<strong>O(nlogn)</strong></td>
+<td>O(1)</td>
+<td>不稳定</td>
+</tr>
+<tr>
+<td>冒泡排序</td>
+<td>O(n^2)</td>
+<td>O(1)</td>
+<td>稳定</td>
+</tr>
+<tr>
+<td>快速排序</td>
+<td>期望值O(nlogn),需要考虑数组几乎有序和存在大量重复元素的情况</td>
+<td>O(1)</td>
+<td>不稳定</td>
+</tr>
+<tr>
+<td>归并排序</td>
+<td>O(nlogn)</td>
+<td>O(n)</td>
+<td>不稳定</td>
+</tr>
+<tr>
+<td>堆排序</td>
+<td>O(nlogn)</td>
+<td>O(n)</td>
+<td>不稳定</td>
+</tr>
+</tbody></table>
+<h2 id="直接插入排序（InsertSort）"><a href="#直接插入排序（InsertSort）" class="headerlink" title="直接插入排序（InsertSort）"></a>直接插入排序（InsertSort）</h2><figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">SelectSort</span><span class="params">(T* arr, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">        <span class="keyword">int</span> idx = i;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> j = i + <span class="number">1</span>; j &lt; n; j++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (arr[j] &lt; arr[idx]) &#123;</span><br><span class="line">                idx = j;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">swap</span>(arr[i], arr[idx]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="希尔排序（ShellSort）"><a href="#希尔排序（ShellSort）" class="headerlink" title="希尔排序（ShellSort）"></a>希尔排序（ShellSort）</h2><h3 id="普通希尔排序"><a href="#普通希尔排序" class="headerlink" title="普通希尔排序"></a>普通希尔排序</h3><figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">ShellSort</span><span class="params">(T* arr, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> gap = n / <span class="number">2</span>; gap &gt; <span class="number">0</span>; gap /= <span class="number">2</span>) &#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = gap; i &lt; n; i++) &#123;</span><br><span class="line">            <span class="keyword">int</span> j;</span><br><span class="line">            T tmp = arr[i];</span><br><span class="line">            <span class="keyword">for</span> (j = i; j &gt;= gap &amp;&amp; arr[j - gap] &gt; tmp; j -= gap) &#123;</span><br><span class="line">                arr[j] = arr[j - gap];</span><br><span class="line">            &#125;</span><br><span class="line">            arr[j] = tmp;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="优化希尔排序（调整increment-sequence）"><a href="#优化希尔排序（调整increment-sequence）" class="headerlink" title="优化希尔排序（调整increment sequence）"></a>优化希尔排序（调整increment sequence）</h3><figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">ShellSort</span><span class="params">(T arr[], <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> h = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">while</span> (h &lt; n / <span class="number">3</span>)</span><br><span class="line">        h = <span class="number">3</span> * h + <span class="number">1</span>;</span><br><span class="line">    <span class="comment">// 计算 increment sequence: 1, 4, 13, 40, 121, 364, 1093...</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (h &gt;= <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="comment">// h-sort the array</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = h; i &lt; n; i++) &#123;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 对 arr[i], arr[i-h], arr[i-2*h], arr[i-3*h]... 使用插入排序</span></span><br><span class="line">            T e = arr[i];</span><br><span class="line">            <span class="keyword">int</span> j;</span><br><span class="line">            <span class="keyword">for</span> (j = i; j &gt;= h &amp;&amp; e &lt; arr[j - h]; j -= h)</span><br><span class="line">                arr[j] = arr[j - h];</span><br><span class="line">            arr[j] = e;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        h /= <span class="number">3</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="冒泡排序（BubbleSot）"><a href="#冒泡排序（BubbleSot）" class="headerlink" title="冒泡排序（BubbleSot）"></a>冒泡排序（BubbleSot）</h2><figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">BubbleSot</span><span class="params">(T* arr, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; n; i++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; n - i; j++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (arr[j] &gt; arr[j + <span class="number">1</span>]) &#123;</span><br><span class="line">                <span class="built_in">swap</span>(arr[j], arr[j + <span class="number">1</span>]);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="冒泡排序的优化"><a href="#冒泡排序的优化" class="headerlink" title="冒泡排序的优化"></a>冒泡排序的优化</h3><figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="comment">// * 用一个变量flag记录下最后一个发生交换的位置，后面没有发生交换的已经有序 </span></span><br><span class="line"><span class="comment">// * 所以可以用这个值来作为下一次比较结束的位置 </span></span><br><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">BubbleSot</span><span class="params">(T *arr, <span class="keyword">int</span> n)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> flag = n;</span><br><span class="line">    <span class="keyword">int</span> j, k;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; flag; i++) &#123;</span><br><span class="line">        k = flag; <span class="comment">//保存最后一次交换的位置下标</span></span><br><span class="line">        flag = <span class="number">0</span>; <span class="comment">//如果flag值不变则说明之后的数据有序，因此可退出程序</span></span><br><span class="line">        <span class="keyword">for</span>(j = <span class="number">0</span>; j &lt; k; j++) &#123;</span><br><span class="line">            <span class="keyword">if</span>(arr[j] &gt; arr[j+<span class="number">1</span>]) &#123;</span><br><span class="line">                flag = j;</span><br><span class="line">                <span class="built_in">swap</span>(arr[j], arr[j+<span class="number">1</span>]);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="快速排序（QuickSort）"><a href="#快速排序（QuickSort）" class="headerlink" title="快速排序（QuickSort）"></a>快速排序（QuickSort）</h2><h3 id="普通快排"><a href="#普通快排" class="headerlink" title="普通快排"></a>普通快排</h3><p>​    快排核心步骤就是partition操作，partition操作一般情况下就是以arr[l]元素（记为tmp）为基准将arr分为大于tmp和小于tmp两部分 ， 最终将其分为 arr[l … j] &lt; tmp和arr[j+1 … r] &gt; tmp两部分</p>
+<p><img data-src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAARkAAACBCAIAAAB7MFnaAAAAA3NCSVQICAjb4U/gAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAFIklEQVR4nO3dy3HbMBSFYTGTCrJ0C3ID2bgbV+VU47RAteDs0gKz4ISDAQkIIA4I8PL/VnpQN5DCYzxIUcM0TTcAxb61bgBgBFkCNMgSoEGWAA2yBGiQJUCDLAEaZAnQIEuABlkCNMgSoEGWAA2yBGiQJUDje+4LHo9HjXYY8/r62roJRxjHsXUT6rrf7xlbTznGccza/rKldny256J9gx3+D+4oxRgP0CBLbQzD8PSRw4p7zy53hU26guz5EiSmaRqGYfo/WHJvu7xtQqUqNRJZyNKhQj2Ad3tyJiRLnNaZCSUQTZClQ7m7fkq/tDZHzuvW4ht7t0Ov2uz3nr4KC7J0tHgG1s9u3n0apHmDdVZDPWFoMEmE0pGlo0W6lKcxC91dZyal49rRKyKCLB1n3SdEHpnDsNz2brAm0SGydJzcnXs9KqtnDmdoMZ1YpiBLDUTi8XQWFCniDdXiR428bs1dKmS+tA9ZaiM0X0p81eYYL7JosTkjcpcEM5qOAM57sC80fnMX+lCOfqmNfV1BfIxXiONLhchSGzXGeJvSV8k5vlSIMd6JMc/pCv1SG4kxWKY6m+sKT7sa79n19hylFSJLbaSM8bzh2XoD91WJZ74updJPj0AislRRpPMJPRU5USjr34pkb7195PtODCPT5f1N4mIPibjegw1c74FSlGpQinU8QIMsARpkCdAgS4AGWQI0yBKgQZYADbIEaJAlQIMsARpkCdAgS4AGWQI0yBKgQZYADbIEaJAlQCP7uhm/fv+p1JQSP3/8bd0EGJT1HXUj107J+15+2OPxoBSlllJZ2zPGAzTIEqBBlgANsgRoGFl7iOBXT3AM+/3SfB3A1q2AffazBByDLAEadedL728vy+2Pzy/3kY/Pr5TbVZuHS3FnzjVm0RWz9P724oZhvrskanl2Tk7ocUBljs0wDMtPTml/EadiluKRWGLmdT6hxwGVpS/SLkpVH+MtkaCfgW0V1x68MR5gG+t4gEbd+ZI3rnPvuksO7lPe4+W8n17luO1l1d4T6s6X0iNRbzRIeDCrvScwxgM0Tn9u6zwmfG/dDJiU1ZXRLwEaeddO6fB7+cJ5JKUoVVKKfgnQIEuABlkCNMgSoHH6NfEU7qn1hRNTVan12f6qap28QUmp5csRm5V3Ny9UtpD9LHkfXMnnKCx10x2G7/MNFpaKfLPI/fZRbvO0X1jyMMZDj0JXvHHz4349trCshP0sCXsSpLvgx25/jDeTHMWT7x+qVpUMe7xSbts6eYNncZUsSXY1LVUAbs5op593N+vwY6/H/hjPtWOEvUmy95eM+zfbo3p3N/XeL2xYz66VJYne/soWTsfjBZHOfpa0fxFV+1m3f6fNv8F67GfJVbijrI+ZKBrVUT/Q/xt0O95+PreZ/bUH7UU6VbuXsFXeuE54skKJwjcYuTZDyUJL1Us+2M/STfeRaT967eS+qzrl1eKv3V25aj92rTEeUI+Rfkk406UUpfbJzlLuD7UfUwpob8oxjmPW9pSi1HVKMV8CNMgSoEGWAA2yBGhcKEvzjyv2UAQmXShLQFVGjtWmmBTnj0iKwCT6JUDjKv2S5KRs4fnmsOcq/dJ8ZLqHIrDqKlkCaiNLgAZZAjTIEqBxlXU8iapXC8DZ2c+S9iI4kjowyX6WbhwXwiGyf0e9XlOA3tzv9/SN+7paH3BerOMBGmQJ0CBLgAZZAjTIEqBBlgANsgRokCVAgywBGmQJ0CBLgAZZAjTIEqBBlgCNfzoo093eocOXAAAAAElFTkSuQmCC" alt="partition"></p>
+<h4 id="各个变量定义"><a href="#各个变量定义" class="headerlink" title="各个变量定义"></a>各个变量定义</h4><ul>
+<li><p>l：arr左边界</p>
+</li>
+<li><p>r：arr有边界</p>
+</li>
+<li><p>i：准备进行判断比较的位置</p>
+</li>
+<li><p>j：<code>arr[l ... j] &lt; tmp</code>，一开始 <code>j == l</code> 时表示没有元素小于tmp</p>
+</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">int</span> _Partition(T* arr, <span class="keyword">int</span> l, <span class="keyword">int</span> r) &#123;</span><br><span class="line">    <span class="keyword">int</span> j = l;</span><br><span class="line">    T tmp = arr[l];</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = l + <span class="number">1</span>; i &lt;= r; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (arr[i] &lt; tmp) &#123;</span><br><span class="line">            <span class="built_in">swap</span>(arr[j + <span class="number">1</span>], arr[i]);</span><br><span class="line">            j++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">swap</span>(arr[j], arr[l]);</span><br><span class="line">    <span class="keyword">return</span> j;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="普通快排的缺陷"><a href="#普通快排的缺陷" class="headerlink" title="普通快排的缺陷"></a>普通快排的缺陷</h4><ul>
+<li>当数组近乎有序的时候,算法会退化成O(n^2)级别的算法</li>
+</ul>
+<p>​    采用随机选择一个标定元素，则该排序的期望值为O(nlogn)，大概率上避免退化成O(n^2)；在partition一开始的位置<code> swap(arr[l], arr[(rand() % (r - l + 1)) + l]);</code></p>
+<ul>
+<li>当存在大量重复元素的时候,算法也会退化成O(n^2)<h4 id="普通快排的优化"><a href="#普通快排的优化" class="headerlink" title="普通快排的优化"></a>普通快排的优化</h4>​</li>
+<li>将整个数组通过标定元素比较分成三个部分，小于标定，等于标定，大于标定因此如果存在大量重复元素也能高效执行算</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">void</span> _QuickSort3(T* arr, <span class="keyword">int</span> l, <span class="keyword">int</span> r) &#123;</span><br><span class="line">    <span class="comment">// 当元素少于16个时，使用插入排序作为快速排序的自排序更为高效</span></span><br><span class="line">    <span class="keyword">if</span> (r - l &lt;= <span class="number">16</span>) &#123;</span><br><span class="line">        <span class="built_in">InsertSort</span>(arr + l, r - l + <span class="number">1</span>);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">swap</span>(arr[l], arr[(<span class="built_in">rand</span>() % (r - l + <span class="number">1</span>)) + l]);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> tmp = arr[l];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> lt = l;     <span class="comment">// arr[l...lt] &lt; tmp</span></span><br><span class="line">    <span class="keyword">int</span> gt = r + <span class="number">1</span>; <span class="comment">// arr[gt...r] &gt; tmp</span></span><br><span class="line">    <span class="keyword">int</span> i = l + <span class="number">1</span>;  <span class="comment">// arr[lt+1...i-1] == tmp</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (gt &gt; i) &#123;</span><br><span class="line">        <span class="keyword">if</span> (arr[i] &lt; tmp) &#123;</span><br><span class="line">            <span class="built_in">swap</span>(arr[++lt], arr[i++]);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (arr[i] &gt; tmp) &#123;</span><br><span class="line">            <span class="built_in">swap</span>(arr[--gt], arr[i]);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123; <span class="comment">// tmp == arr[i]</span></span><br><span class="line">            i++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">swap</span>(arr[lt], arr[l]);</span><br><span class="line"></span><br><span class="line">    _QuickSort3(arr, l, lt - <span class="number">1</span>);</span><br><span class="line">    _QuickSort3(arr, gt, r);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">QuickSort3</span><span class="params">(T* arr, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="built_in">srand</span>(<span class="built_in">time</span>(<span class="literal">NULL</span>));</span><br><span class="line">    _QuickSort3(arr, <span class="number">0</span>, n - <span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="归并排序（MergeSort）"><a href="#归并排序（MergeSort）" class="headerlink" title="归并排序（MergeSort）"></a>归并排序（MergeSort）</h2><h3 id="Merge操作"><a href="#Merge操作" class="headerlink" title="Merge操作"></a>Merge操作</h3><p><img data-src="data:image/png;base64,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"></p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 将arr[l, mid]和arr[mid+1, r]进行合并</span></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">void</span> _Merge(T* arr, <span class="keyword">int</span> l, <span class="keyword">int</span> mid, <span class="keyword">int</span> r) &#123;</span><br><span class="line"></span><br><span class="line">    T* aux = <span class="keyword">new</span> T[r - l + <span class="number">1</span>];</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = l; i &lt;= r; i++) &#123;</span><br><span class="line">        aux[i - l] = arr[i];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">int</span> i = l;</span><br><span class="line">    <span class="keyword">int</span> j = mid + <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> k = l; k &lt;= r; k++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (i &gt; mid) &#123;</span><br><span class="line">            arr[k] = aux[j - l];</span><br><span class="line">            j++;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (j &gt; r) &#123;</span><br><span class="line">            arr[k] = aux[i - l];</span><br><span class="line">            i++;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (aux[i - l] &lt; aux[j - l]) &#123;</span><br><span class="line">            arr[k] = aux[i - l];</span><br><span class="line">            i++;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            arr[k] = aux[j - l];</span><br><span class="line">            j++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">delete</span>[] aux;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 对于arr[l, r]进行归并排序;l,r是闭区间</span></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">void</span> _MergeSort(T* arr, <span class="keyword">int</span> l, <span class="keyword">int</span> r) &#123;</span><br><span class="line">    <span class="comment">// arr长度不大于15的时候使用插入排序</span></span><br><span class="line">    <span class="comment">// 可提升算法效率</span></span><br><span class="line">    <span class="keyword">if</span> (r - l &lt;= <span class="number">15</span>) &#123;</span><br><span class="line">        <span class="built_in">InsertSort</span>(arr + l, r - l + <span class="number">1</span>);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (l &gt;= r) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">int</span> mid = (r + l) / <span class="number">2</span>;</span><br><span class="line">    _MergeSort(arr, l, mid);</span><br><span class="line">    _MergeSort(arr, mid + <span class="number">1</span>, r);</span><br><span class="line">    _Merge1(arr, l, mid, r);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">MergeSort</span><span class="params">(T* arr, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">    _MergeSort(arr, <span class="number">0</span>, n - <span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+]]></content>
+      <categories>
+        <category>算法</category>
+        <category>排序</category>
+      </categories>
+      <tags>
+        <tag>排序算法</tag>
+      </tags>
+  </entry>
 </search>

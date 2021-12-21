@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"jesonwoo.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="学习排序算法时的总结和记录">
+<meta property="og:type" content="article">
+<meta property="og:title" content="常用排序算法总结">
+<meta property="og:url" content="https://jesonwoo.github.io/2021/12/21/%E5%B8%B8%E7%94%A8%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E6%80%BB%E7%BB%93/index.html">
+<meta property="og:site_name" content="Jesonwoo&#39;s Blog">
+<meta property="og:description" content="学习排序算法时的总结和记录">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAARkAAACBCAIAAAB7MFnaAAAAA3NCSVQICAjb4U/gAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAFIklEQVR4nO3dy3HbMBSFYTGTCrJ0C3ID2bgbV+VU47RAteDs0gKz4ISDAQkIIA4I8PL/VnpQN5DCYzxIUcM0TTcAxb61bgBgBFkCNMgSoEGWAA2yBGiQJUCDLAEaZAnQIEuABlkCNMgSoEGWAA2yBGiQJUDje+4LHo9HjXYY8/r62roJRxjHsXUT6rrf7xlbTznGccza/rKldny256J9gx3+D+4oxRgP0CBLbQzD8PSRw4p7zy53hU26guz5EiSmaRqGYfo/WHJvu7xtQqUqNRJZyNKhQj2Ad3tyJiRLnNaZCSUQTZClQ7m7fkq/tDZHzuvW4ht7t0Ov2uz3nr4KC7J0tHgG1s9u3n0apHmDdVZDPWFoMEmE0pGlo0W6lKcxC91dZyal49rRKyKCLB1n3SdEHpnDsNz2brAm0SGydJzcnXs9KqtnDmdoMZ1YpiBLDUTi8XQWFCniDdXiR428bs1dKmS+tA9ZaiM0X0p81eYYL7JosTkjcpcEM5qOAM57sC80fnMX+lCOfqmNfV1BfIxXiONLhchSGzXGeJvSV8k5vlSIMd6JMc/pCv1SG4kxWKY6m+sKT7sa79n19hylFSJLbaSM8bzh2XoD91WJZ74updJPj0AislRRpPMJPRU5USjr34pkb7195PtODCPT5f1N4mIPibjegw1c74FSlGpQinU8QIMsARpkCdAgS4AGWQI0yBKgQZYADbIEaJAlQIMsARpkCdAgS4AGWQI0yBKgQZYADbIEaJAlQCP7uhm/fv+p1JQSP3/8bd0EGJT1HXUj107J+15+2OPxoBSlllJZ2zPGAzTIEqBBlgANsgRoGFl7iOBXT3AM+/3SfB3A1q2AffazBByDLAEadedL728vy+2Pzy/3kY/Pr5TbVZuHS3FnzjVm0RWz9P724oZhvrskanl2Tk7ocUBljs0wDMtPTml/EadiluKRWGLmdT6hxwGVpS/SLkpVH+MtkaCfgW0V1x68MR5gG+t4gEbd+ZI3rnPvuksO7lPe4+W8n17luO1l1d4T6s6X0iNRbzRIeDCrvScwxgM0Tn9u6zwmfG/dDJiU1ZXRLwEaeddO6fB7+cJ5JKUoVVKKfgnQIEuABlkCNMgSoHH6NfEU7qn1hRNTVan12f6qap28QUmp5csRm5V3Ny9UtpD9LHkfXMnnKCx10x2G7/MNFpaKfLPI/fZRbvO0X1jyMMZDj0JXvHHz4349trCshP0sCXsSpLvgx25/jDeTHMWT7x+qVpUMe7xSbts6eYNncZUsSXY1LVUAbs5op593N+vwY6/H/hjPtWOEvUmy95eM+zfbo3p3N/XeL2xYz66VJYne/soWTsfjBZHOfpa0fxFV+1m3f6fNv8F67GfJVbijrI+ZKBrVUT/Q/xt0O95+PreZ/bUH7UU6VbuXsFXeuE54skKJwjcYuTZDyUJL1Us+2M/STfeRaT967eS+qzrl1eKv3V25aj92rTEeUI+Rfkk406UUpfbJzlLuD7UfUwpob8oxjmPW9pSi1HVKMV8CNMgSoEGWAA2yBGhcKEvzjyv2UAQmXShLQFVGjtWmmBTnj0iKwCT6JUDjKv2S5KRs4fnmsOcq/dJ8ZLqHIrDqKlkCaiNLgAZZAjTIEqBxlXU8iapXC8DZ2c+S9iI4kjowyX6WbhwXwiGyf0e9XlOA3tzv9/SN+7paH3BerOMBGmQJ0CBLgAZZAjTIEqBBlgANsgRokCVAgywBGmQJ0CBLgAZZAjTIEqBBlgCNfzoo093eocOXAAAAAElFTkSuQmCC">
+<meta property="og:image" content="data:image/png;base64,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">
+<meta property="article:published_time" content="2021-12-21T15:17:02.000Z">
+<meta property="article:modified_time" content="2021-12-21T15:26:11.605Z">
+<meta property="article:author" content="Jesonwoo">
+<meta property="article:tag" content="排序算法">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAARkAAACBCAIAAAB7MFnaAAAAA3NCSVQICAjb4U/gAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAFIklEQVR4nO3dy3HbMBSFYTGTCrJ0C3ID2bgbV+VU47RAteDs0gKz4ISDAQkIIA4I8PL/VnpQN5DCYzxIUcM0TTcAxb61bgBgBFkCNMgSoEGWAA2yBGiQJUCDLAEaZAnQIEuABlkCNMgSoEGWAA2yBGiQJUDje+4LHo9HjXYY8/r62roJRxjHsXUT6rrf7xlbTznGccza/rKldny256J9gx3+D+4oxRgP0CBLbQzD8PSRw4p7zy53hU26guz5EiSmaRqGYfo/WHJvu7xtQqUqNRJZyNKhQj2Ad3tyJiRLnNaZCSUQTZClQ7m7fkq/tDZHzuvW4ht7t0Ov2uz3nr4KC7J0tHgG1s9u3n0apHmDdVZDPWFoMEmE0pGlo0W6lKcxC91dZyal49rRKyKCLB1n3SdEHpnDsNz2brAm0SGydJzcnXs9KqtnDmdoMZ1YpiBLDUTi8XQWFCniDdXiR428bs1dKmS+tA9ZaiM0X0p81eYYL7JosTkjcpcEM5qOAM57sC80fnMX+lCOfqmNfV1BfIxXiONLhchSGzXGeJvSV8k5vlSIMd6JMc/pCv1SG4kxWKY6m+sKT7sa79n19hylFSJLbaSM8bzh2XoD91WJZ74updJPj0AislRRpPMJPRU5USjr34pkb7195PtODCPT5f1N4mIPibjegw1c74FSlGpQinU8QIMsARpkCdAgS4AGWQI0yBKgQZYADbIEaJAlQIMsARpkCdAgS4AGWQI0yBKgQZYADbIEaJAlQCP7uhm/fv+p1JQSP3/8bd0EGJT1HXUj107J+15+2OPxoBSlllJZ2zPGAzTIEqBBlgANsgRoGFl7iOBXT3AM+/3SfB3A1q2AffazBByDLAEadedL728vy+2Pzy/3kY/Pr5TbVZuHS3FnzjVm0RWz9P724oZhvrskanl2Tk7ocUBljs0wDMtPTml/EadiluKRWGLmdT6hxwGVpS/SLkpVH+MtkaCfgW0V1x68MR5gG+t4gEbd+ZI3rnPvuksO7lPe4+W8n17luO1l1d4T6s6X0iNRbzRIeDCrvScwxgM0Tn9u6zwmfG/dDJiU1ZXRLwEaeddO6fB7+cJ5JKUoVVKKfgnQIEuABlkCNMgSoHH6NfEU7qn1hRNTVan12f6qap28QUmp5csRm5V3Ny9UtpD9LHkfXMnnKCx10x2G7/MNFpaKfLPI/fZRbvO0X1jyMMZDj0JXvHHz4349trCshP0sCXsSpLvgx25/jDeTHMWT7x+qVpUMe7xSbts6eYNncZUsSXY1LVUAbs5op593N+vwY6/H/hjPtWOEvUmy95eM+zfbo3p3N/XeL2xYz66VJYne/soWTsfjBZHOfpa0fxFV+1m3f6fNv8F67GfJVbijrI+ZKBrVUT/Q/xt0O95+PreZ/bUH7UU6VbuXsFXeuE54skKJwjcYuTZDyUJL1Us+2M/STfeRaT967eS+qzrl1eKv3V25aj92rTEeUI+Rfkk406UUpfbJzlLuD7UfUwpob8oxjmPW9pSi1HVKMV8CNMgSoEGWAA2yBGhcKEvzjyv2UAQmXShLQFVGjtWmmBTnj0iKwCT6JUDjKv2S5KRs4fnmsOcq/dJ8ZLqHIrDqKlkCaiNLgAZZAjTIEqBxlXU8iapXC8DZ2c+S9iI4kjowyX6WbhwXwiGyf0e9XlOA3tzv9/SN+7paH3BerOMBGmQJ0CBLgAZZAjTIEqBBlgANsgRokCVAgywBGmQJ0CBLgAZZAjTIEqBBlgCNfzoo093eocOXAAAAAElFTkSuQmCC">
+
+<link rel="canonical" href="https://jesonwoo.github.io/2021/12/21/%E5%B8%B8%E7%94%A8%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E6%80%BB%E7%BB%93/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>常用排序算法总结 | Jesonwoo's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Jesonwoo's Blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Jesonwoo's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">珍爱家人，珍惜财富，保持进步</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jesonwoo.github.io/2021/12/21/%E5%B8%B8%E7%94%A8%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E6%80%BB%E7%BB%93/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/apple-touch-icon-next.png">
+      <meta itemprop="name" content="Jesonwoo">
+      <meta itemprop="description" content="记录自己生活点点滴滴">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jesonwoo's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          常用排序算法总结
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-12-21 23:17:02 / 修改时间：23:26:11" itemprop="dateCreated datePublished" datetime="2021-12-21T23:17:02+08:00">2021-12-21</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/" itemprop="url" rel="index"><span itemprop="name">排序</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/12/21/%E5%B8%B8%E7%94%A8%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E6%80%BB%E7%BB%93/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/12/21/%E5%B8%B8%E7%94%A8%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E6%80%BB%E7%BB%93/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>学习排序算法时的总结和记录</p>
+<span id="more"></span>
+
+<h2 id="各种排序算法比较"><a href="#各种排序算法比较" class="headerlink" title="各种排序算法比较"></a>各种排序算法比较</h2><table>
+<thead>
+<tr>
+<th>排序</th>
+<th>时间复杂度</th>
+<th>空间复杂度</th>
+<th>稳定性</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>直接插入排序</td>
+<td>O(n^2)</td>
+<td>O(1)</td>
+<td>稳定</td>
+</tr>
+<tr>
+<td>希尔排序</td>
+<td>根据增量序列的不同时间复杂度不同；可以很接近<strong>O(nlogn)</strong></td>
+<td>O(1)</td>
+<td>不稳定</td>
+</tr>
+<tr>
+<td>冒泡排序</td>
+<td>O(n^2)</td>
+<td>O(1)</td>
+<td>稳定</td>
+</tr>
+<tr>
+<td>快速排序</td>
+<td>期望值O(nlogn),需要考虑数组几乎有序和存在大量重复元素的情况</td>
+<td>O(1)</td>
+<td>不稳定</td>
+</tr>
+<tr>
+<td>归并排序</td>
+<td>O(nlogn)</td>
+<td>O(n)</td>
+<td>不稳定</td>
+</tr>
+<tr>
+<td>堆排序</td>
+<td>O(nlogn)</td>
+<td>O(n)</td>
+<td>不稳定</td>
+</tr>
+</tbody></table>
+<h2 id="直接插入排序（InsertSort）"><a href="#直接插入排序（InsertSort）" class="headerlink" title="直接插入排序（InsertSort）"></a>直接插入排序（InsertSort）</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">SelectSort</span><span class="params">(T* arr, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">        <span class="keyword">int</span> idx = i;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> j = i + <span class="number">1</span>; j &lt; n; j++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (arr[j] &lt; arr[idx]) &#123;</span><br><span class="line">                idx = j;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">swap</span>(arr[i], arr[idx]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="希尔排序（ShellSort）"><a href="#希尔排序（ShellSort）" class="headerlink" title="希尔排序（ShellSort）"></a>希尔排序（ShellSort）</h2><h3 id="普通希尔排序"><a href="#普通希尔排序" class="headerlink" title="普通希尔排序"></a>普通希尔排序</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">ShellSort</span><span class="params">(T* arr, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> gap = n / <span class="number">2</span>; gap &gt; <span class="number">0</span>; gap /= <span class="number">2</span>) &#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = gap; i &lt; n; i++) &#123;</span><br><span class="line">            <span class="keyword">int</span> j;</span><br><span class="line">            T tmp = arr[i];</span><br><span class="line">            <span class="keyword">for</span> (j = i; j &gt;= gap &amp;&amp; arr[j - gap] &gt; tmp; j -= gap) &#123;</span><br><span class="line">                arr[j] = arr[j - gap];</span><br><span class="line">            &#125;</span><br><span class="line">            arr[j] = tmp;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="优化希尔排序（调整increment-sequence）"><a href="#优化希尔排序（调整increment-sequence）" class="headerlink" title="优化希尔排序（调整increment sequence）"></a>优化希尔排序（调整increment sequence）</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">ShellSort</span><span class="params">(T arr[], <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> h = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">while</span> (h &lt; n / <span class="number">3</span>)</span><br><span class="line">        h = <span class="number">3</span> * h + <span class="number">1</span>;</span><br><span class="line">    <span class="comment">// 计算 increment sequence: 1, 4, 13, 40, 121, 364, 1093...</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (h &gt;= <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="comment">// h-sort the array</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = h; i &lt; n; i++) &#123;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 对 arr[i], arr[i-h], arr[i-2*h], arr[i-3*h]... 使用插入排序</span></span><br><span class="line">            T e = arr[i];</span><br><span class="line">            <span class="keyword">int</span> j;</span><br><span class="line">            <span class="keyword">for</span> (j = i; j &gt;= h &amp;&amp; e &lt; arr[j - h]; j -= h)</span><br><span class="line">                arr[j] = arr[j - h];</span><br><span class="line">            arr[j] = e;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        h /= <span class="number">3</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="冒泡排序（BubbleSot）"><a href="#冒泡排序（BubbleSot）" class="headerlink" title="冒泡排序（BubbleSot）"></a>冒泡排序（BubbleSot）</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">BubbleSot</span><span class="params">(T* arr, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; n; i++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; n - i; j++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (arr[j] &gt; arr[j + <span class="number">1</span>]) &#123;</span><br><span class="line">                <span class="built_in">swap</span>(arr[j], arr[j + <span class="number">1</span>]);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="冒泡排序的优化"><a href="#冒泡排序的优化" class="headerlink" title="冒泡排序的优化"></a>冒泡排序的优化</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// * 用一个变量flag记录下最后一个发生交换的位置，后面没有发生交换的已经有序 </span></span><br><span class="line"><span class="comment">// * 所以可以用这个值来作为下一次比较结束的位置 </span></span><br><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">BubbleSot</span><span class="params">(T *arr, <span class="keyword">int</span> n)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> flag = n;</span><br><span class="line">    <span class="keyword">int</span> j, k;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; flag; i++) &#123;</span><br><span class="line">        k = flag; <span class="comment">//保存最后一次交换的位置下标</span></span><br><span class="line">        flag = <span class="number">0</span>; <span class="comment">//如果flag值不变则说明之后的数据有序，因此可退出程序</span></span><br><span class="line">        <span class="keyword">for</span>(j = <span class="number">0</span>; j &lt; k; j++) &#123;</span><br><span class="line">            <span class="keyword">if</span>(arr[j] &gt; arr[j+<span class="number">1</span>]) &#123;</span><br><span class="line">                flag = j;</span><br><span class="line">                <span class="built_in">swap</span>(arr[j], arr[j+<span class="number">1</span>]);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="快速排序（QuickSort）"><a href="#快速排序（QuickSort）" class="headerlink" title="快速排序（QuickSort）"></a>快速排序（QuickSort）</h2><h3 id="普通快排"><a href="#普通快排" class="headerlink" title="普通快排"></a>普通快排</h3><p>​    快排核心步骤就是partition操作，partition操作一般情况下就是以arr[l]元素（记为tmp）为基准将arr分为大于tmp和小于tmp两部分 ， 最终将其分为 arr[l … j] &lt; tmp和arr[j+1 … r] &gt; tmp两部分</p>
+<p><img data-src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAARkAAACBCAIAAAB7MFnaAAAAA3NCSVQICAjb4U/gAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAFIklEQVR4nO3dy3HbMBSFYTGTCrJ0C3ID2bgbV+VU47RAteDs0gKz4ISDAQkIIA4I8PL/VnpQN5DCYzxIUcM0TTcAxb61bgBgBFkCNMgSoEGWAA2yBGiQJUCDLAEaZAnQIEuABlkCNMgSoEGWAA2yBGiQJUDje+4LHo9HjXYY8/r62roJRxjHsXUT6rrf7xlbTznGccza/rKldny256J9gx3+D+4oxRgP0CBLbQzD8PSRw4p7zy53hU26guz5EiSmaRqGYfo/WHJvu7xtQqUqNRJZyNKhQj2Ad3tyJiRLnNaZCSUQTZClQ7m7fkq/tDZHzuvW4ht7t0Ov2uz3nr4KC7J0tHgG1s9u3n0apHmDdVZDPWFoMEmE0pGlo0W6lKcxC91dZyal49rRKyKCLB1n3SdEHpnDsNz2brAm0SGydJzcnXs9KqtnDmdoMZ1YpiBLDUTi8XQWFCniDdXiR428bs1dKmS+tA9ZaiM0X0p81eYYL7JosTkjcpcEM5qOAM57sC80fnMX+lCOfqmNfV1BfIxXiONLhchSGzXGeJvSV8k5vlSIMd6JMc/pCv1SG4kxWKY6m+sKT7sa79n19hylFSJLbaSM8bzh2XoD91WJZ74updJPj0AislRRpPMJPRU5USjr34pkb7195PtODCPT5f1N4mIPibjegw1c74FSlGpQinU8QIMsARpkCdAgS4AGWQI0yBKgQZYADbIEaJAlQIMsARpkCdAgS4AGWQI0yBKgQZYADbIEaJAlQCP7uhm/fv+p1JQSP3/8bd0EGJT1HXUj107J+15+2OPxoBSlllJZ2zPGAzTIEqBBlgANsgRoGFl7iOBXT3AM+/3SfB3A1q2AffazBByDLAEadedL728vy+2Pzy/3kY/Pr5TbVZuHS3FnzjVm0RWz9P724oZhvrskanl2Tk7ocUBljs0wDMtPTml/EadiluKRWGLmdT6hxwGVpS/SLkpVH+MtkaCfgW0V1x68MR5gG+t4gEbd+ZI3rnPvuksO7lPe4+W8n17luO1l1d4T6s6X0iNRbzRIeDCrvScwxgM0Tn9u6zwmfG/dDJiU1ZXRLwEaeddO6fB7+cJ5JKUoVVKKfgnQIEuABlkCNMgSoHH6NfEU7qn1hRNTVan12f6qap28QUmp5csRm5V3Ny9UtpD9LHkfXMnnKCx10x2G7/MNFpaKfLPI/fZRbvO0X1jyMMZDj0JXvHHz4349trCshP0sCXsSpLvgx25/jDeTHMWT7x+qVpUMe7xSbts6eYNncZUsSXY1LVUAbs5op593N+vwY6/H/hjPtWOEvUmy95eM+zfbo3p3N/XeL2xYz66VJYne/soWTsfjBZHOfpa0fxFV+1m3f6fNv8F67GfJVbijrI+ZKBrVUT/Q/xt0O95+PreZ/bUH7UU6VbuXsFXeuE54skKJwjcYuTZDyUJL1Us+2M/STfeRaT967eS+qzrl1eKv3V25aj92rTEeUI+Rfkk406UUpfbJzlLuD7UfUwpob8oxjmPW9pSi1HVKMV8CNMgSoEGWAA2yBGhcKEvzjyv2UAQmXShLQFVGjtWmmBTnj0iKwCT6JUDjKv2S5KRs4fnmsOcq/dJ8ZLqHIrDqKlkCaiNLgAZZAjTIEqBxlXU8iapXC8DZ2c+S9iI4kjowyX6WbhwXwiGyf0e9XlOA3tzv9/SN+7paH3BerOMBGmQJ0CBLgAZZAjTIEqBBlgANsgRokCVAgywBGmQJ0CBLgAZZAjTIEqBBlgCNfzoo093eocOXAAAAAElFTkSuQmCC" alt="partition"></p>
+<h4 id="各个变量定义"><a href="#各个变量定义" class="headerlink" title="各个变量定义"></a>各个变量定义</h4><ul>
+<li><p>l：arr左边界</p>
+</li>
+<li><p>r：arr有边界</p>
+</li>
+<li><p>i：准备进行判断比较的位置</p>
+</li>
+<li><p>j：<code>arr[l ... j] &lt; tmp</code>，一开始 <code>j == l</code> 时表示没有元素小于tmp</p>
+</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">int</span> _Partition(T* arr, <span class="keyword">int</span> l, <span class="keyword">int</span> r) &#123;</span><br><span class="line">    <span class="keyword">int</span> j = l;</span><br><span class="line">    T tmp = arr[l];</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = l + <span class="number">1</span>; i &lt;= r; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (arr[i] &lt; tmp) &#123;</span><br><span class="line">            <span class="built_in">swap</span>(arr[j + <span class="number">1</span>], arr[i]);</span><br><span class="line">            j++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">swap</span>(arr[j], arr[l]);</span><br><span class="line">    <span class="keyword">return</span> j;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="普通快排的缺陷"><a href="#普通快排的缺陷" class="headerlink" title="普通快排的缺陷"></a>普通快排的缺陷</h4><ul>
+<li>当数组近乎有序的时候,算法会退化成O(n^2)级别的算法</li>
+</ul>
+<p>​    采用随机选择一个标定元素，则该排序的期望值为O(nlogn)，大概率上避免退化成O(n^2)；在partition一开始的位置<code> swap(arr[l], arr[(rand() % (r - l + 1)) + l]);</code></p>
+<ul>
+<li>当存在大量重复元素的时候,算法也会退化成O(n^2)<h4 id="普通快排的优化"><a href="#普通快排的优化" class="headerlink" title="普通快排的优化"></a>普通快排的优化</h4>​</li>
+<li>将整个数组通过标定元素比较分成三个部分，小于标定，等于标定，大于标定因此如果存在大量重复元素也能高效执行算</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">void</span> _QuickSort3(T* arr, <span class="keyword">int</span> l, <span class="keyword">int</span> r) &#123;</span><br><span class="line">    <span class="comment">// 当元素少于16个时，使用插入排序作为快速排序的自排序更为高效</span></span><br><span class="line">    <span class="keyword">if</span> (r - l &lt;= <span class="number">16</span>) &#123;</span><br><span class="line">        <span class="built_in">InsertSort</span>(arr + l, r - l + <span class="number">1</span>);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">swap</span>(arr[l], arr[(<span class="built_in">rand</span>() % (r - l + <span class="number">1</span>)) + l]);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> tmp = arr[l];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> lt = l;     <span class="comment">// arr[l...lt] &lt; tmp</span></span><br><span class="line">    <span class="keyword">int</span> gt = r + <span class="number">1</span>; <span class="comment">// arr[gt...r] &gt; tmp</span></span><br><span class="line">    <span class="keyword">int</span> i = l + <span class="number">1</span>;  <span class="comment">// arr[lt+1...i-1] == tmp</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (gt &gt; i) &#123;</span><br><span class="line">        <span class="keyword">if</span> (arr[i] &lt; tmp) &#123;</span><br><span class="line">            <span class="built_in">swap</span>(arr[++lt], arr[i++]);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (arr[i] &gt; tmp) &#123;</span><br><span class="line">            <span class="built_in">swap</span>(arr[--gt], arr[i]);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123; <span class="comment">// tmp == arr[i]</span></span><br><span class="line">            i++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">swap</span>(arr[lt], arr[l]);</span><br><span class="line"></span><br><span class="line">    _QuickSort3(arr, l, lt - <span class="number">1</span>);</span><br><span class="line">    _QuickSort3(arr, gt, r);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">QuickSort3</span><span class="params">(T* arr, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="built_in">srand</span>(<span class="built_in">time</span>(<span class="literal">NULL</span>));</span><br><span class="line">    _QuickSort3(arr, <span class="number">0</span>, n - <span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="归并排序（MergeSort）"><a href="#归并排序（MergeSort）" class="headerlink" title="归并排序（MergeSort）"></a>归并排序（MergeSort）</h2><h3 id="Merge操作"><a href="#Merge操作" class="headerlink" title="Merge操作"></a>Merge操作</h3><p><img data-src="data:image/png;base64,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"></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 将arr[l, mid]和arr[mid+1, r]进行合并</span></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">void</span> _Merge(T* arr, <span class="keyword">int</span> l, <span class="keyword">int</span> mid, <span class="keyword">int</span> r) &#123;</span><br><span class="line"></span><br><span class="line">    T* aux = <span class="keyword">new</span> T[r - l + <span class="number">1</span>];</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = l; i &lt;= r; i++) &#123;</span><br><span class="line">        aux[i - l] = arr[i];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">int</span> i = l;</span><br><span class="line">    <span class="keyword">int</span> j = mid + <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> k = l; k &lt;= r; k++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (i &gt; mid) &#123;</span><br><span class="line">            arr[k] = aux[j - l];</span><br><span class="line">            j++;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (j &gt; r) &#123;</span><br><span class="line">            arr[k] = aux[i - l];</span><br><span class="line">            i++;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (aux[i - l] &lt; aux[j - l]) &#123;</span><br><span class="line">            arr[k] = aux[i - l];</span><br><span class="line">            i++;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            arr[k] = aux[j - l];</span><br><span class="line">            j++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">delete</span>[] aux;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 对于arr[l, r]进行归并排序;l,r是闭区间</span></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">void</span> _MergeSort(T* arr, <span class="keyword">int</span> l, <span class="keyword">int</span> r) &#123;</span><br><span class="line">    <span class="comment">// arr长度不大于15的时候使用插入排序</span></span><br><span class="line">    <span class="comment">// 可提升算法效率</span></span><br><span class="line">    <span class="keyword">if</span> (r - l &lt;= <span class="number">15</span>) &#123;</span><br><span class="line">        <span class="built_in">InsertSort</span>(arr + l, r - l + <span class="number">1</span>);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (l &gt;= r) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">int</span> mid = (r + l) / <span class="number">2</span>;</span><br><span class="line">    _MergeSort(arr, l, mid);</span><br><span class="line">    _MergeSort(arr, mid + <span class="number">1</span>, r);</span><br><span class="line">    _Merge1(arr, l, mid, r);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">MergeSort</span><span class="params">(T* arr, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">    _MergeSort(arr, <span class="number">0</span>, n - <span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Jesonwoo
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://jesonwoo.github.io/2021/12/21/%E5%B8%B8%E7%94%A8%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E6%80%BB%E7%BB%93/" title="常用排序算法总结">https://jesonwoo.github.io/2021/12/21/常用排序算法总结/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/" rel="tag"># 排序算法</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/12/06/Git%E4%BB%93%E5%BA%93%E4%BD%93%E7%A7%AF%E7%B2%BE%E7%AE%80/" rel="prev" title="Git仓库体积精简">
+      <i class="fa fa-chevron-left"></i> Git仓库体积精简
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%84%E7%A7%8D%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E6%AF%94%E8%BE%83"><span class="nav-number">1.</span> <span class="nav-text">各种排序算法比较</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B4%E6%8E%A5%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F%EF%BC%88InsertSort%EF%BC%89"><span class="nav-number">2.</span> <span class="nav-text">直接插入排序（InsertSort）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%8C%E5%B0%94%E6%8E%92%E5%BA%8F%EF%BC%88ShellSort%EF%BC%89"><span class="nav-number">3.</span> <span class="nav-text">希尔排序（ShellSort）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%99%AE%E9%80%9A%E5%B8%8C%E5%B0%94%E6%8E%92%E5%BA%8F"><span class="nav-number">3.1.</span> <span class="nav-text">普通希尔排序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%98%E5%8C%96%E5%B8%8C%E5%B0%94%E6%8E%92%E5%BA%8F%EF%BC%88%E8%B0%83%E6%95%B4increment-sequence%EF%BC%89"><span class="nav-number">3.2.</span> <span class="nav-text">优化希尔排序（调整increment sequence）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%92%E6%B3%A1%E6%8E%92%E5%BA%8F%EF%BC%88BubbleSot%EF%BC%89"><span class="nav-number">4.</span> <span class="nav-text">冒泡排序（BubbleSot）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%92%E6%B3%A1%E6%8E%92%E5%BA%8F%E7%9A%84%E4%BC%98%E5%8C%96"><span class="nav-number">4.1.</span> <span class="nav-text">冒泡排序的优化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F%EF%BC%88QuickSort%EF%BC%89"><span class="nav-number">5.</span> <span class="nav-text">快速排序（QuickSort）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%99%AE%E9%80%9A%E5%BF%AB%E6%8E%92"><span class="nav-number">5.1.</span> <span class="nav-text">普通快排</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%84%E4%B8%AA%E5%8F%98%E9%87%8F%E5%AE%9A%E4%B9%89"><span class="nav-number">5.1.1.</span> <span class="nav-text">各个变量定义</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%99%AE%E9%80%9A%E5%BF%AB%E6%8E%92%E7%9A%84%E7%BC%BA%E9%99%B7"><span class="nav-number">5.1.2.</span> <span class="nav-text">普通快排的缺陷</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%99%AE%E9%80%9A%E5%BF%AB%E6%8E%92%E7%9A%84%E4%BC%98%E5%8C%96"><span class="nav-number">5.1.3.</span> <span class="nav-text">普通快排的优化</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F%EF%BC%88MergeSort%EF%BC%89"><span class="nav-number">6.</span> <span class="nav-text">归并排序（MergeSort）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Merge%E6%93%8D%E4%BD%9C"><span class="nav-number">6.1.</span> <span class="nav-text">Merge操作</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Jesonwoo"
+      src="/images/apple-touch-icon-next.png">
+  <p class="site-author-name" itemprop="name">Jesonwoo</p>
+  <div class="site-description" itemprop="description">记录自己生活点点滴滴</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jesonwoo</span>
+</div>
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+-->
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/lozad@1/dist/lozad.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'QX8dz38vLpB4AtaegyUGJNuN-gzGzoHsz',
+      appKey     : 'oMj1CMvXOBHcMfzfmpY1Rl9o',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
