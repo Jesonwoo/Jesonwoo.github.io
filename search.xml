@@ -311,7 +311,7 @@
 <li>在泛型中支持完美转发（Perfect Forwarding），<strong>提升编程效率</strong></li>
 </ol>
 <span id="more"></span>
-<p>说在前面：一下所有代码均在g++编译器上进行编译并验证过的</p>
+<p><strong>说在前面：一下所有代码均在g++编译器上进行编译并验证过的</strong></p>
 <h2 id="右值引用"><a href="#右值引用" class="headerlink" title="右值引用"></a>右值引用</h2><p>我们先来看看它和左值引用的区别</p>
 <ul>
 <li>左值：<code>int a = 1;</code>其中a就是左值，那种非临时的对象即有分配内存且有名字的对象就是左值</li>
