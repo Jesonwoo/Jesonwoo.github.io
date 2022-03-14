@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"jesonwoo.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="因为工作需要，最近需要搭建跨平台工程。其中涉及到了依赖库交叉编译等工作。因此趁这个机会写一个关于c&#x2F;c++编译器的工作机制的小系列，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="程序编译(1)-目标文件的编译步骤">
+<meta property="og:url" content="https://jesonwoo.github.io/2022/03/04/%E7%A8%8B%E5%BA%8F%E7%BC%96%E8%AF%91-1-%E7%9B%AE%E6%A0%87%E6%96%87%E4%BB%B6%E7%9A%84%E7%BC%96%E8%AF%91%E6%AD%A5%E9%AA%A4/index.html">
+<meta property="og:site_name" content="Jesonwoo&#39;s Blog">
+<meta property="og:description" content="因为工作需要，最近需要搭建跨平台工程。其中涉及到了依赖库交叉编译等工作。因此趁这个机会写一个关于c&#x2F;c++编译器的工作机制的小系列，">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://jesonblogbucket.oss-cn-shenzhen.aliyuncs.com/编译基本流程.png">
+<meta property="og:image" content="https://jesonblogbucket.oss-cn-shenzhen.aliyuncs.com/链接与库-语法树.jpg">
+<meta property="article:published_time" content="2022-03-04T07:33:12.000Z">
+<meta property="article:modified_time" content="2022-03-14T09:22:01.271Z">
+<meta property="article:author" content="Jesonwoo">
+<meta property="article:tag" content="编译原理">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://jesonblogbucket.oss-cn-shenzhen.aliyuncs.com/编译基本流程.png">
+
+<link rel="canonical" href="https://jesonwoo.github.io/2022/03/04/%E7%A8%8B%E5%BA%8F%E7%BC%96%E8%AF%91-1-%E7%9B%AE%E6%A0%87%E6%96%87%E4%BB%B6%E7%9A%84%E7%BC%96%E8%AF%91%E6%AD%A5%E9%AA%A4/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>程序编译(1)-目标文件的编译步骤 | Jesonwoo's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Jesonwoo's Blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Jesonwoo's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">珍爱家人，珍惜财富，保持进步</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jesonwoo.github.io/2022/03/04/%E7%A8%8B%E5%BA%8F%E7%BC%96%E8%AF%91-1-%E7%9B%AE%E6%A0%87%E6%96%87%E4%BB%B6%E7%9A%84%E7%BC%96%E8%AF%91%E6%AD%A5%E9%AA%A4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/apple-touch-icon-next.png">
+      <meta itemprop="name" content="Jesonwoo">
+      <meta itemprop="description" content="记录自己生活点点滴滴">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jesonwoo's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          程序编译(1)-目标文件的编译步骤
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-04 15:33:12" itemprop="dateCreated datePublished" datetime="2022-03-04T15:33:12+08:00">2022-03-04</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-14 17:22:01" itemprop="dateModified" datetime="2022-03-14T17:22:01+08:00">2022-03-14</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%BC%96%E8%AF%91%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/" itemprop="url" rel="index"><span itemprop="name">编译基本原理</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2022/03/04/%E7%A8%8B%E5%BA%8F%E7%BC%96%E8%AF%91-1-%E7%9B%AE%E6%A0%87%E6%96%87%E4%BB%B6%E7%9A%84%E7%BC%96%E8%AF%91%E6%AD%A5%E9%AA%A4/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2022/03/04/%E7%A8%8B%E5%BA%8F%E7%BC%96%E8%AF%91-1-%E7%9B%AE%E6%A0%87%E6%96%87%E4%BB%B6%E7%9A%84%E7%BC%96%E8%AF%91%E6%AD%A5%E9%AA%A4/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>因为工作需要，最近需要搭建跨平台工程。其中涉及到了依赖库交叉编译等工作。<br>因此趁这个机会写一个关于c/c++编译器的工作机制的小系列，</p>
+<span id="more"></span>
+
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>广义上的”编译”指的是由代码、模块、资源等构建成机器码的过程。狭义上的”编译”则指的是源代码到汇编代码的过程。而标题中的”编译”则是广义上的。那为什么需要了解其中的原理呢？</p>
+<p><strong>了解原理可以让我们解决编译过程中遇到的任何问题都可以快速定位和解决</strong></p>
+<h2 id="基本过程"><a href="#基本过程" class="headerlink" title="基本过程"></a>基本过程</h2><blockquote>
+<p> c/c++广义上的编译都需要经过以下这4步：预处理（Prepressing）-&gt;编译（Compilation）-&gt;汇编（Assembly）-&gt;链接（Linking）</p>
+</blockquote>
+<p>示例代码如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> DEF_VAR 100</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">int</span> kStaticInitVar = <span class="number">10</span>;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">int</span> kStaticUnnitVar;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">func</span><span class="params">(<span class="keyword">int</span> var)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%s-var:%d\n&quot;</span>,__FUNCTION__, var);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">int</span> localStaticInitVar = <span class="number">10</span>;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">int</span> localStaticUnintVar;</span><br><span class="line"></span><br><span class="line">    func(kStaticInitVar + localStaticInitVar + DEF_VAR);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>整个编译过程可以通过<code>gcc -v test.c -o test.out</code>查看，结果如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">Using built-in specs.</span><br><span class="line">COLLECT_GCC=gcc</span><br><span class="line">COLLECT_LTO_WRAPPER=/usr/lib/gcc/arm-linux-gnueabihf/10/lto-wrapper</span><br><span class="line">Target: arm-linux-gnueabihf</span><br><span class="line">Configured with: ../src/configure -v --with-pkgversion=&#x27;Raspbian 10.2.1-6+rpi1&#x27; --with-bugurl=file:///usr/share/doc/gcc-10/README.Bugs --enable-languages=c,ada,c++,go,d,fortran,objc,obj-c++,m2 --prefix=/usr --with-gcc-major-version-only --program-suffix=-10 --program-prefix=arm-linux-gnueabihf- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-libitm --disable-libquadmath --disable-libquadmath-support --enable-plugin --with-system-zlib --enable-libphobos-checking=release --with-target-system-zlib=auto --enable-objc-gc=auto --enable-multiarch --disable-sjlj-exceptions --with-arch=armv6 --with-fpu=vfp --with-float=hard --disable-werror --enable-checking=release --build=arm-linux-gnueabihf --host=arm-linux-gnueabihf --target=arm-linux-gnueabihf</span><br><span class="line">Thread model: posix</span><br><span class="line">Supported LTO compression algorithms: zlib zstd</span><br><span class="line">gcc version 10.2.1 20210110 (Raspbian 10.2.1-6+rpi1)</span><br><span class="line">COLLECT_GCC_OPTIONS=&#x27;-v&#x27; &#x27;-o&#x27; &#x27;test.out&#x27;  &#x27;-mfloat-abi=hard&#x27; &#x27;-mfpu=vfp&#x27; &#x27;-mtls-dialect=gnu&#x27; &#x27;-marm&#x27; &#x27;-march=armv6+fp&#x27;</span><br><span class="line"> /usr/lib/gcc/arm-linux-gnueabihf/10/cc1 -quiet -v -imultilib . -imultiarch arm-linux-gnueabihf test.c -quiet -dumpbase test.c -mfloat-abi=hard -mfpu=vfp -mtls-dialect=gnu -marm -march=armv6+fp -auxbase test -version -o /tmp/ccr8xe6E.s</span><br><span class="line">GNU C17 (Raspbian 10.2.1-6+rpi1) version 10.2.1 20210110 (arm-linux-gnueabihf)</span><br><span class="line">        compiled by GNU C version 10.2.1 20210110, GMP version 6.2.1, MPFR version 4.1.0, MPC version 1.2.0, isl version isl-0.23-GMP</span><br><span class="line"></span><br><span class="line">GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072</span><br><span class="line">ignoring nonexistent directory &quot;/usr/local/include/arm-linux-gnueabihf&quot;</span><br><span class="line">ignoring nonexistent directory &quot;/usr/lib/gcc/arm-linux-gnueabihf/10/include-fixed&quot;</span><br><span class="line">ignoring nonexistent directory &quot;/usr/lib/gcc/arm-linux-gnueabihf/10/../../../../arm-linux-gnueabihf/include&quot;</span><br><span class="line"><span class="meta">#</span><span class="bash">include <span class="string">&quot;...&quot;</span> search starts here:</span></span><br><span class="line"><span class="meta">#</span><span class="bash">include &lt;...&gt; search starts here:</span></span><br><span class="line"> /usr/lib/gcc/arm-linux-gnueabihf/10/include</span><br><span class="line"> /usr/local/include</span><br><span class="line"> /usr/include/arm-linux-gnueabihf</span><br><span class="line"> /usr/include</span><br><span class="line">End of search list.</span><br><span class="line">GNU C17 (Raspbian 10.2.1-6+rpi1) version 10.2.1 20210110 (arm-linux-gnueabihf)</span><br><span class="line">        compiled by GNU C version 10.2.1 20210110, GMP version 6.2.1, MPFR version 4.1.0, MPC version 1.2.0, isl version isl-0.23-GMP</span><br><span class="line"></span><br><span class="line">GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072</span><br><span class="line">Compiler executable checksum: b0c2f0ffcfbe7fc710aaf45c31c63944</span><br><span class="line">COLLECT_GCC_OPTIONS=&#x27;-v&#x27; &#x27;-o&#x27; &#x27;test.out&#x27;  &#x27;-mfloat-abi=hard&#x27; &#x27;-mfpu=vfp&#x27; &#x27;-mtls-dialect=gnu&#x27; &#x27;-marm&#x27; &#x27;-march=armv6+fp&#x27;</span><br><span class="line"> as -v -march=armv6 -mfloat-abi=hard -mfpu=vfp -meabi=5 -o /tmp/ccT9vuDF.o /tmp/ccr8xe6E.s</span><br><span class="line">GNU assembler version 2.35.2 (arm-linux-gnueabihf) using BFD version (GNU Binutils for Raspbian) 2.35.2</span><br><span class="line">COMPILER_PATH=/usr/lib/gcc/arm-linux-gnueabihf/10/:/usr/lib/gcc/arm-linux-gnueabihf/10/:/usr/lib/gcc/arm-linux-gnueabihf/:/usr/lib/gcc/arm-linux-gnueabihf/10/:/usr/lib/gcc/arm-linux-gnueabihf/</span><br><span class="line">LIBRARY_PATH=/usr/lib/gcc/arm-linux-gnueabihf/10/:/usr/lib/gcc/arm-linux-gnueabihf/10/../../../arm-linux-gnueabihf/:/usr/lib/gcc/arm-linux-gnueabihf/10/../../../:/lib/arm-linux-gnueabihf/:/lib/:/usr/lib/arm-linux-gnueabihf/:/usr/lib/</span><br><span class="line">COLLECT_GCC_OPTIONS=&#x27;-v&#x27; &#x27;-o&#x27; &#x27;test.out&#x27;  &#x27;-mfloat-abi=hard&#x27; &#x27;-mfpu=vfp&#x27; &#x27;-mtls-dialect=gnu&#x27; &#x27;-marm&#x27; &#x27;-march=armv6+fp&#x27;</span><br><span class="line"> /usr/lib/gcc/arm-linux-gnueabihf/10/collect2 -plugin /usr/lib/gcc/arm-linux-gnueabihf/10/liblto_plugin.so -plugin-opt=/usr/lib/gcc/arm-linux-gnueabihf/10/lto-wrapper -plugin-opt=-fresolution=/tmp/ccvxcalC.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --build-id --eh-frame-hdr -dynamic-linker /lib/ld-linux-armhf.so.3 -X --hash-style=gnu --as-needed -m armelf_linux_eabi -o test.out /usr/lib/gcc/arm-linux-gnueabihf/10/../../../arm-linux-gnueabihf/crt1.o /usr/lib/gcc/arm-linux-gnueabihf/10/../../../arm-linux-gnueabihf/crti.o /usr/lib/gcc/arm-linux-gnueabihf/10/crtbegin.o -L/usr/lib/gcc/arm-linux-gnueabihf/10 -L/usr/lib/gcc/arm-linux-gnueabihf/10/../../../arm-linux-gnueabihf -L/usr/lib/gcc/arm-linux-gnueabihf/10/../../.. -L/lib/arm-linux-gnueabihf -L/usr/lib/arm-linux-gnueabihf /tmp/ccT9vuDF.o -lgcc --push-state --as-needed -lgcc_s --pop-state -lc -lgcc --push-state --as-needed -lgcc_s --pop-state /usr/lib/gcc/arm-linux-gnueabihf/10/crtend.o /usr/lib/gcc/arm-linux-gnueabihf/10/../../../arm-linux-gnueabihf/crtn.o</span><br><span class="line">COLLECT_GCC_OPTIONS=&#x27;-v&#x27; &#x27;-o&#x27; &#x27;test.out&#x27;  &#x27;-mfloat-abi=hard&#x27; &#x27;-mfpu=vfp&#x27; &#x27;-mtls-dialect=gnu&#x27; &#x27;-marm&#x27; &#x27;-march=armv6+fp&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>我们可以看到，在整个编译过程中使用到了<code>cc1</code>、<code>as</code>、<code>collect2</code>工具来完成<strong>预处理（Prepressing）-&gt;编译（Compilation）-&gt;汇编（Assembly）-&gt;链接（Linking）</strong>整个过程的。由此可知gcc是通过间接调用各种程序来完成编译（广义）过程，其中<code>cc1</code>完成了预处理和编译过程，<code>as</code>完成汇编过程，<code>collect2</code>完成链接过程。</p>
+<ul>
+<li><code>cc1</code>：也是通过间接调用<code>cpp</code>（C Pre-Processor）c预处理器进行预处理，自身进行编译</li>
+<li><code>as</code>：汇编器，将汇编代码转化为机器码</li>
+<li><code>collect2</code>：实际上的链接器是<code>ld</code>，gcc是通过调用<code>collect2</code>来间接调用<code>ld</code>进而进行链接的，感兴趣可以阅读[collect2](<a target="_blank" rel="noopener" href="https://www.wanglianghome.org/2011/04/14/collect2/">collect2 | 懒惰的程序员 (wanglianghome.org)</a>)这边文章</li>
+</ul>
+<center class="half">
+    <img data-src="https://jesonblogbucket.oss-cn-shenzhen.aliyuncs.com/编译基本流程.png" width="800"/>
+</center>
+
+<h2 id="预处理"><a href="#预处理" class="headerlink" title="预处理"></a>预处理</h2><p><code>gcc -E test.c -o test.i</code>，参数<code>-E</code>表示只进行预处理，不进行后续操作，生成<code>test.i</code>文件。效果等同于使用预处理器<code>cpp</code></p>
+<p>预处理后的结果如下，由于文本过长，只粘贴关键部分</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"># <span class="number">1</span> <span class="string">&quot;test.c&quot;</span></span><br><span class="line"><span class="comment">/*中间是头文件stdio.h递归展开后的结果*/</span></span><br><span class="line"># <span class="number">5</span> <span class="string">&quot;test.c&quot;</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">int</span> kStaticInitVar = <span class="number">10</span>;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">int</span> kStaticUnnitVar;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">func</span><span class="params">(<span class="keyword">int</span> var)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%s-var:%d\n&quot;</span>,__FUNCTION__, var);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">int</span> localStaticInitVar = <span class="number">10</span>;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">int</span> localStaticUnintVar;</span><br><span class="line"></span><br><span class="line">    func(kStaticInitVar + localStaticInitVar + <span class="number">100</span>); <span class="comment">// DEF_VAR宏被替换</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>预编译规则如下：</p>
+<ul>
+<li>替换所有宏定义</li>
+<li>处理所有条件预编译指令，#if、#elif、#endif等等</li>
+<li>递归展开所有用到的#include头文件包含指令</li>
+<li>删除所有注释</li>
+<li>添加行号以及文件标识，便于报错提示以及生成调试信息</li>
+</ul>
+<h2 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h2><p><code>gcc -S test.i -o test.s</code>，参数<code>-S</code>表示只进行预处理、编译（狭义上）并生成汇编代码，当然可以用<code>test.c</code>生成汇编代码，使用<code>test.i</code>是因为其为预编译的产物，方便流程讲解。</p>
+<p>编译过程主要包括这几个过程<strong>词法分析、语法分析、语义分析、优化代码</strong>。以下我只做总结概括，详情见：《程序员的自我修养-链接、装载与库》-2.2章节：</p>
+<h3 id="词法分析"><a href="#词法分析" class="headerlink" title="词法分析"></a>词法分析</h3><p>由扫描器扫描源代码，将<strong>关键字、标识符、字面量、操作符</strong>进行归纳和分类，并存储到表中，供<strong>语法分析</strong>环节使用。</p>
+<h3 id="语法分析"><a href="#语法分析" class="headerlink" title="语法分析"></a>语法分析</h3><p>把扫描器产生的记号生成以<strong>表达式</strong>为节点的<strong>语法树</strong>，整个分析过程采用了<strong>上下文无关语法（Context-free Grammar）</strong>（感兴趣可以深入了解，工作中基本用不上）。通过了<strong>语法分析</strong>并不代表代码过关了，此过程只是确认最小表达式是否符合语法。</p>
+<p><strong>此图引用至《程序员的自我修养-链接、装载与库》，侵删~</strong></p>
+<center class="half">
+    <img data-src="https://jesonblogbucket.oss-cn-shenzhen.aliyuncs.com/链接与库-语法树.jpg" width="800"/>
+    <br> 程序员的自我修养-链接、装载与库-语法树
+</center>
+
+<h3 id="语义分析"><a href="#语义分析" class="headerlink" title="语义分析"></a>语义分析</h3><p>只进行语法分析是远远不够的，好比每个词语都没问题，但是不按照语法进行有意义的组合拿别人就无法理解。编译器也一样，例如两个指针的乘法运算是无意义的。</p>
+<p>语义分析分为<strong>静态语义</strong>和<strong>动态语义</strong>。静态语义是指编译期可以确定的，动态语义指的是在运行时候才能确定的语义。</p>
+<h3 id="代码优化"><a href="#代码优化" class="headerlink" title="代码优化"></a>代码优化</h3><p><strong>编译器通过分析源代码，识别出其中可以进行优化的部分, 并进行调整以改善程序性能</strong>，常见的优化例如<strong>常量传播、常量折叠</strong>，在c++中的有<strong>返回值优化（RVO）</strong>等，当然编译器所作的优化是有限的~</p>
+<h2 id="汇编"><a href="#汇编" class="headerlink" title="汇编"></a>汇编</h2><p><code>gcc test.s -o test.o</code>表示将汇编代码转化为机器码，也等同于<code>gcc -c test.c -o test.o</code></p>
+<h2 id="链接"><a href="#链接" class="headerlink" title="链接"></a>链接</h2><p>链接过程本质上就是将引用的外部符号进行地址修正的过程~`test.c<code>中并没有实现</code>printf<code>函数。我们用[nm](https://www.man7.org/linux/man-pages/man1/nm.1.html)命令来看看</code>test.o<code>的符号列表，</code>nm -a test.o`</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">00000000 n .ARM.attributes</span><br><span class="line">00000000 b .bss</span><br><span class="line">00000000 n .comment</span><br><span class="line">00000000 d .data</span><br><span class="line">00000000 T func</span><br><span class="line">0000000c r __FUNCTION__.2</span><br><span class="line">00000000 d kStaticInitVar</span><br><span class="line">00000000 b kStaticUnnitVar</span><br><span class="line">00000004 d localStaticInitVar.1</span><br><span class="line">00000004 b localStaticUnintVar.0</span><br><span class="line">00000034 T main</span><br><span class="line">00000000 n .note.GNU-stack</span><br><span class="line">         U printf</span><br><span class="line">00000000 r .rodata</span><br><span class="line">00000000 a test.c</span><br><span class="line">00000000 t .text</span><br></pre></td></tr></table></figure>
+
+<p>其中<code>printf</code>符号的状态是U，表示符号在当前文件中是未定义的。然后执行下面命令生成<code>test.out</code>：</p>
+<p><strong>注意：下面命令只是用于与我拥有相同环境，下面命令只是我在<code>collect2</code>命令基础上将参数<code>/tmp/ccT9vuDF.o</code>替换为<code>test.o</code></strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/lib/gcc/arm-linux-gnueabihf/10/collect2 -plugin /usr/lib/gcc/arm-linux-gnueabihf/10/liblto_plugin.so -plugin-opt=/usr/lib/gcc/arm-linux-gnueabihf/10/lto-wrapper -plugin-opt=-fresolution=/tmp/ccvxcalC.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --build-id --eh-frame-hdr -dynamic-linker /lib/ld-linux-armhf.so.3 -X --hash-style=gnu --as-needed -m armelf_linux_eabi -o test.out /usr/lib/gcc/arm-linux-gnueabihf/10/../../../arm-linux-gnueabihf/crt1.o /usr/lib/gcc/arm-linux-gnueabihf/10/../../../arm-linux-gnueabihf/crti.o /usr/lib/gcc/arm-linux-gnueabihf/10/crtbegin.o -L/usr/lib/gcc/arm-linux-gnueabihf/10 -L/usr/lib/gcc/arm-linux-gnueabihf/10/../../../arm-linux-gnueabihf -L/usr/lib/gcc/arm-linux-gnueabihf/10/../../.. -L/lib/arm-linux-gnueabihf -L/usr/lib/arm-linux-gnueabihf test.o -lgcc --push-state --as-needed -lgcc_s --pop-state -lc -lgcc --push-state --as-needed -lgcc_s --pop-state /usr/lib/gcc/arm-linux-gnueabihf/10/crtend.o /usr/lib/gcc/arm-linux-gnueabihf/10/../../../arm-linux-gnueabihf/crtn.o</span><br></pre></td></tr></table></figure>
+
+<p>查看<code>test.out</code>符号，<code>nm -a test.out</code></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line">00000000 a</span><br><span class="line">         U abort@GLIBC_2.4</span><br><span class="line">000104e8 r all_implied_fbits</span><br><span class="line">0001058c r all_implied_fbits</span><br><span class="line">00000000 n .ARM.attributes</span><br><span class="line">0001061c r .ARM.exidx</span><br><span class="line">00021030 b .bss</span><br><span class="line">0002103c B __bss_end__</span><br><span class="line">0002103c B _bss_end__</span><br><span class="line">00021030 B __bss_start</span><br><span class="line">00021030 B __bss_start__</span><br><span class="line">00010354 t call_weak_fn</span><br><span class="line">00000000 n .comment</span><br><span class="line">00021030 b completed.0</span><br><span class="line">00000000 a crtstuff.c</span><br><span class="line">00000000 a crtstuff.c</span><br><span class="line">00021020 d .data</span><br><span class="line">00021020 D __data_start</span><br><span class="line">00021020 W data_start</span><br><span class="line">00010378 t deregister_tm_clones</span><br><span class="line">000103dc t __do_global_dtors_aux</span><br><span class="line">00020f14 d __do_global_dtors_aux_fini_array_entry</span><br><span class="line">00021024 D __dso_handle</span><br><span class="line">00020f18 d .dynamic</span><br><span class="line">00020f18 d _DYNAMIC</span><br><span class="line">00010230 r .dynstr</span><br><span class="line">000101e0 r .dynsym</span><br><span class="line">00021030 D _edata</span><br><span class="line">00010624 r .eh_frame</span><br><span class="line">00000000 a elf-init.oS</span><br><span class="line">0002103c B __end__</span><br><span class="line">0002103c B _end</span><br><span class="line">000104dc t .fini</span><br><span class="line">000104dc T _fini</span><br><span class="line">00020f14 d .fini_array</span><br><span class="line">00010404 t frame_dummy</span><br><span class="line">00020f10 d __frame_dummy_init_array_entry</span><br><span class="line">00010624 r __FRAME_END__</span><br><span class="line">00010408 T func</span><br><span class="line">00010584 r __FUNCTION__.2</span><br><span class="line">00021000 d _GLOBAL_OFFSET_TABLE_</span><br><span class="line">         w __gmon_start__</span><br><span class="line">000101b4 r .gnu.hash</span><br><span class="line">00010274 r .gnu.version</span><br><span class="line">00010280 r .gnu.version_r</span><br><span class="line">00021000 d .got</span><br><span class="line">000102c8 t .init</span><br><span class="line">000102c8 T _init</span><br><span class="line">00020f10 d .init_array</span><br><span class="line">00020f14 d __init_array_end</span><br><span class="line">00020f10 d __init_array_start</span><br><span class="line">00010154 r .interp</span><br><span class="line">000104e4 R _IO_stdin_used</span><br><span class="line">00021028 d kStaticInitVar</span><br><span class="line">00021034 b kStaticUnnitVar</span><br><span class="line">000104d8 T __libc_csu_fini</span><br><span class="line">00010478 T __libc_csu_init</span><br><span class="line">         U __libc_start_main@GLIBC_2.4</span><br><span class="line">0002102c d localStaticInitVar.1</span><br><span class="line">00021038 b localStaticUnintVar.0</span><br><span class="line">0001043c T main</span><br><span class="line">00010194 r .note.ABI-tag</span><br><span class="line">00010170 r .note.gnu.build-id</span><br><span class="line">000102d4 t .plt</span><br><span class="line">         U printf@GLIBC_2.4</span><br><span class="line">000103a4 t register_tm_clones</span><br><span class="line">000102a0 r .rel.dyn</span><br><span class="line">000102a8 r .rel.plt</span><br><span class="line">000104e4 r .rodata</span><br><span class="line">00010318 T _start</span><br><span class="line">00000000 a test.c</span><br><span class="line">00010318 t .text</span><br><span class="line">00021030 D __TMC_END__</span><br><span class="line">00000000 a /usr/lib/gcc/arm-linux-gnueabihf/10/../../../arm-linux-gnueabihf/crt1.o</span><br><span class="line">00000000 a /usr/lib/gcc/arm-linux-gnueabihf/10/../../../arm-linux-gnueabihf/crti.o</span><br><span class="line">00000000 a /usr/lib/gcc/arm-linux-gnueabihf/10/../../../arm-linux-gnueabihf/crtn.o</span><br></pre></td></tr></table></figure>
+
+<p>我们对比一下可以很容易发现一些变化：</p>
+<ol>
+<li><strong><code>printf</code>符号变成了<code>printf@GLIBC_2.4</code>且还是未定义</strong>：此符号gcc在链接时根据当前版本修改符号，使得在运行程序而动态链接时不会链接到其他gcc版本的<code>printf</code></li>
+<li><strong>很多符号的地址都被修正了，符号<code>func</code>符号地址从00000000被修正为00010408</strong>：单独模块(*.o或者*.obj)的编译时编译器并不知道<code>func</code>的地址</li>
+<li><strong>符号增多</strong>：目标文件和可执行文件elf文件格式存在差异，例如增加了<code>.dynamic</code>段相关信息，即动态链接信息</li>
+<li>其他（有时间再研究研究）</li>
+</ol>
+<p>当前演示的链接过程并不是<strong>静态链接</strong>。如果需要进行静态链接则需要加上<code>-static</code>参数。静态链接比较简单，说白了就是递归的将所有引用到的符号归档到一个文件中，因此静态链接后的文件都会大上许多~经常与静态链接一起提及的就是<strong>动态链接</strong>。动态链接的链接时期是程序运行时，当前链接环节可以理解为为动态链接做准备。</p>
+<p><strong>静态链接和动态链接最主要的区别：两者的链接时期不一致，静态链接在程序编译链接时期，动态链接则是程序运行时</strong></p>
+<p>这里可以说内容比较多，现在只是简单提一嘴，后续会有专门的文章来聊聊这两者具体的差异以及各自的机制~</p>
+<p>最后总结一下链接过程：</p>
+<ul>
+<li><p>链接器就是在链接的时候自动在所提供的依赖库或者目标文件（*.o或者*.obj）中搜索被引用的外部符号</p>
+</li>
+<li><p>找到之后会将绝对地址指令重新修正，使其指向正确的地址。</p>
+</li>
+<li><p>修正的过程被称之为<strong>重定位</strong>，被修正的地址入口称之为<strong>重定位入口</strong></p>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Jesonwoo
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://jesonwoo.github.io/2022/03/04/%E7%A8%8B%E5%BA%8F%E7%BC%96%E8%AF%91-1-%E7%9B%AE%E6%A0%87%E6%96%87%E4%BB%B6%E7%9A%84%E7%BC%96%E8%AF%91%E6%AD%A5%E9%AA%A4/" title="程序编译(1)-目标文件的编译步骤">https://jesonwoo.github.io/2022/03/04/程序编译-1-目标文件的编译步骤/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%BC%96%E8%AF%91%E5%8E%9F%E7%90%86/" rel="tag"># 编译原理</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/02/11/CPP11-%E5%8F%B3%E5%80%BC%E5%BC%95%E7%94%A8/" rel="prev" title="CPP11-右值引用">
+      <i class="fa fa-chevron-left"></i> CPP11-右值引用
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E8%BF%87%E7%A8%8B"><span class="nav-number">2.</span> <span class="nav-text">基本过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A2%84%E5%A4%84%E7%90%86"><span class="nav-number">3.</span> <span class="nav-text">预处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%96%E8%AF%91"><span class="nav-number">4.</span> <span class="nav-text">编译</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%8D%E6%B3%95%E5%88%86%E6%9E%90"><span class="nav-number">4.1.</span> <span class="nav-text">词法分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%AD%E6%B3%95%E5%88%86%E6%9E%90"><span class="nav-number">4.2.</span> <span class="nav-text">语法分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%AD%E4%B9%89%E5%88%86%E6%9E%90"><span class="nav-number">4.3.</span> <span class="nav-text">语义分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E4%BC%98%E5%8C%96"><span class="nav-number">4.4.</span> <span class="nav-text">代码优化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B1%87%E7%BC%96"><span class="nav-number">5.</span> <span class="nav-text">汇编</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%93%BE%E6%8E%A5"><span class="nav-number">6.</span> <span class="nav-text">链接</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Jesonwoo"
+      src="/images/apple-touch-icon-next.png">
+  <p class="site-author-name" itemprop="name">Jesonwoo</p>
+  <div class="site-description" itemprop="description">记录自己生活点点滴滴</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jesonwoo</span>
+</div>
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+-->
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/lozad@1/dist/lozad.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'QX8dz38vLpB4AtaegyUGJNuN-gzGzoHsz',
+      appKey     : 'oMj1CMvXOBHcMfzfmpY1Rl9o',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
